@@ -2,7 +2,9 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [formData, setFormData] = useState({
+  const [isSignIn, setIsSignIn] = useState(false)
+
+  const [signupData, setSignupData] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -11,117 +13,184 @@ function App() {
     phone: ''
   })
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [signinData, setSigninData] = useState({
+    email: '',
+    password: ''
+  })
+
+  const handleSignupInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setSignupData(prev => ({
       ...prev,
       [name]: value
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSigninInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setSigninData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSignupSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
+    console.log('Signup form submitted:', signupData)
     // Here you would typically send the data to your backend
     alert('Sign up successful!')
   }
 
+  const handleSigninSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log('Signin form submitted:', signinData)
+    // Here you would typically send the data to your backend
+    alert('Sign in successful!')
+  }
+
   return (
     <div className="app">
-      <div className="signup-container">
-        <div className="signup-header">
-          <h1>Create Account</h1>
-          <p>Join us today and start your journey</p>
+      <div className="form-container">
+        <div className="form-header">
+          <h1>{isSignIn ? 'Welcome Back' : 'Create Account'}</h1>
+          <p>{isSignIn ? 'Sign in to your account' : 'Join us today and start your journey'}</p>
         </div>
 
-        <form className="signup-form" onSubmit={handleSubmit}>
-          <div className="form-row">
+        {!isSignIn ? (
+          // Signup Form
+          <form className="auth-form" onSubmit={handleSignupSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="firstName">First Name</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={signupData.firstName}
+                  onChange={handleSignupInputChange}
+                  required
+                  placeholder="Enter your first name"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="lastName">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={signupData.lastName}
+                  onChange={handleSignupInputChange}
+                  required
+                  placeholder="Enter your last name"
+                />
+              </div>
+            </div>
+
             <div className="form-group">
-              <label htmlFor="firstName">First Name</label>
+              <label htmlFor="signupEmail">Email Address</label>
               <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
+                type="email"
+                id="signupEmail"
+                name="email"
+                value={signupData.email}
+                onChange={handleSignupInputChange}
                 required
-                placeholder="Enter your first name"
+                placeholder="Enter your email address"
               />
             </div>
+
             <div className="form-group">
-              <label htmlFor="lastName">Last Name</label>
+              <label htmlFor="phone">Phone Number</label>
               <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
+                type="tel"
+                id="phone"
+                name="phone"
+                value={signupData.phone}
+                onChange={handleSignupInputChange}
                 required
-                placeholder="Enter your last name"
+                placeholder="Enter your phone number"
               />
             </div>
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter your email address"
-            />
-          </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="signupPassword">Password</label>
+                <input
+                  type="password"
+                  id="signupPassword"
+                  name="password"
+                  value={signupData.password}
+                  onChange={handleSignupInputChange}
+                  required
+                  placeholder="Create a password"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={signupData.confirmPassword}
+                  onChange={handleSignupInputChange}
+                  required
+                  placeholder="Confirm your password"
+                />
+              </div>
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="phone">Phone Number</label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter your phone number"
-            />
-          </div>
-
-          <div className="form-row">
+            <button type="submit" className="auth-button">
+              Create Account
+            </button>
+          </form>
+        ) : (
+          // Signin Form
+          <form className="auth-form" onSubmit={handleSigninSubmit}>
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="signinEmail">Email Address</label>
+              <input
+                type="email"
+                id="signinEmail"
+                name="email"
+                value={signinData.email}
+                onChange={handleSigninInputChange}
+                required
+                placeholder="Enter your email address"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="signinPassword">Password</label>
               <input
                 type="password"
-                id="password"
+                id="signinPassword"
                 name="password"
-                value={formData.password}
-                onChange={handleInputChange}
+                value={signinData.password}
+                onChange={handleSigninInputChange}
                 required
-                placeholder="Create a password"
+                placeholder="Enter your password"
               />
             </div>
+
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                required
-                placeholder="Confirm your password"
-              />
+              <div className="forgot-password">
+                <a href="#">Forgot your password?</a>
+              </div>
             </div>
-          </div>
 
-          <button type="submit" className="signup-button">
-            Create Account
-          </button>
-        </form>
+            <button type="submit" className="auth-button">
+              Sign In
+            </button>
+          </form>
+        )}
 
-        <div className="login-link">
-          <p>Already have an account? <a href="#">Sign in</a></p>
+        <div className="auth-link">
+          <p>
+            {isSignIn ? "Don't have an account? " : "Already have an account? "}
+            <a href="#" onClick={(e) => { e.preventDefault(); setIsSignIn(!isSignIn) }}>
+              {isSignIn ? 'Sign up' : 'Sign in'}
+            </a>
+          </p>
         </div>
       </div>
     </div>
