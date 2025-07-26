@@ -1,69 +1,64 @@
-# React + TypeScript + Vite
+# Hotel Booking Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for the Hotel Booking system with JWT authentication.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- User registration and login with JWT tokens
+- Protected routes with authentication
+- Modern UI with Tailwind CSS
+- Responsive design
+- Form validation
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Make sure you have the backend server running on `http://localhost:5000`
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Install dependencies:
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Start the development server:
+```bash
+npm run dev
 ```
+
+3. Open your browser and navigate to `http://localhost:5173`
+
+## Available Routes
+
+- `/` - Redirects to login
+- `/login` - Login page
+- `/signup` - Registration page
+- `/dashboard` - Protected dashboard (requires authentication)
+
+## Testing the Authentication
+
+1. Start both backend and frontend servers
+2. Navigate to `/signup` to create a new account
+3. After successful registration, you'll be redirected to the dashboard
+4. Try accessing `/dashboard` directly - you should stay logged in
+5. Click logout to test the logout functionality
+6. Try accessing `/dashboard` again - you should be redirected to login
+
+## Backend API Endpoints
+
+The frontend connects to these backend endpoints:
+
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/auth/me` - Get current user info
+
+## Technologies Used
+
+- React 19
+- TypeScript
+- React Router DOM
+- Axios for API calls
+- Tailwind CSS for styling
+- JWT for authentication

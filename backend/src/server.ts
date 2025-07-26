@@ -2,7 +2,9 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import authRoutes from './routes/auth';
+import authRouter from './routes/auth';
+import { auth } from './middleware/auth';
+import { AuthRequest } from './types';
 
 // Load environment variables
 dotenv.config({ path: './config.env' });
@@ -23,7 +25,12 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // API Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRouter);
+
+// Protected route example
+app.get('/api/protected', auth, (req: AuthRequest, res: Response) => {
+    res.json({ message: 'This is a protected route', user: req.user });
+});
 
 // Start server
 app.listen(PORT, () => {
