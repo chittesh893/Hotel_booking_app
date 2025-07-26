@@ -132,9 +132,7 @@ function App() {
                   id="confirmPassword"
                   name="confirmPassword"
                   value={signupData.confirmPassword}
-                  onChange={handleSignupInputChange}
-                  required
-                  placeholder="Confirm your password"
+                  onChange={handleSignupInputChange}                  placeholder="Confirm your password"
                 />
               </div>
             </div>
@@ -196,6 +194,7 @@ function App() {
     </div>
   )
 }
+
 
 
 
