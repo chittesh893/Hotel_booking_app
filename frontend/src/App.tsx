@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './components/AuthContext';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
 import Dashboard from './components/Dashboard';
+import AddHotelForm from './components/AddHotelForm';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -64,6 +65,7 @@ const AppRoutes: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/add-hotel" element={<ProtectedRoute><AddHotelForm /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
