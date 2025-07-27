@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
 import authRouter from './routes/auth';
+import hotelsRouter from './routes/hotels';
 import { auth } from './middleware/auth';
 import { AuthRequest } from './types';
 
@@ -26,6 +27,7 @@ app.get('/', (req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/auth', authRouter);
+app.use('/api/hotels', hotelsRouter);
 
 // Protected route example
 app.get('/api/protected', auth, (req: AuthRequest, res: Response) => {

@@ -5,6 +5,7 @@ import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
 import Dashboard from './components/Dashboard';
 import AddHotelForm from './components/AddHotelForm';
+import HotelFeed from './components/HotelFeed';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -66,6 +67,7 @@ const AppRoutes: React.FC = () => {
           }
         />
         <Route path="/add-hotel" element={<ProtectedRoute><AddHotelForm /></ProtectedRoute>} />
+        <Route path="/hotels" element={<ProtectedRoute><HotelFeed /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
