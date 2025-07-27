@@ -16,7 +16,7 @@ const Dashboard: React.FC = () => {
                 `Hotels in ${query}`,
                 `Destinations matching "${query}"`,
                 `Deals for ${query}`,
-                `Popular ${query} hotels`
+              
             ];
             setSearchResults(mockResults);
             setIsSearching(false);
