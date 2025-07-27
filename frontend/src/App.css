@@ -235,5 +235,7 @@ body {
   .auth-button {
     padding: 15px 25px;
     font-size: 1rem;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 }
