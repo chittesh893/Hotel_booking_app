@@ -12,6 +12,7 @@ const LoginForm: React.FC = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
+        console.log(email);
 
         try {
             await login(email, password);
