@@ -6,6 +6,7 @@ import SignupForm from './components/SignupForm';
 import Dashboard from './components/Dashboard';
 import AddHotelForm from './components/AddHotelForm';
 import HotelFeed from './components/HotelFeed';
+import Footer from './components/Footer';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -40,35 +41,40 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const AppRoutes: React.FC = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <LoginForm />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <PublicRoute>
-              <SignupForm />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/add-hotel" element={<ProtectedRoute><AddHotelForm /></ProtectedRoute>} />
-        <Route path="/hotels" element={<ProtectedRoute><HotelFeed /></ProtectedRoute>} />
-      </Routes>
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <LoginForm />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <PublicRoute>
+                  <SignupForm />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/add-hotel" element={<ProtectedRoute><AddHotelForm /></ProtectedRoute>} />
+            <Route path="/hotels" element={<ProtectedRoute><HotelFeed /></ProtectedRoute>} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
     </Router>
   );
 };
