@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from './AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Hotel {
     _id: string;
@@ -15,12 +17,19 @@ interface Hotel {
     images: string[];
     rating: number;
     createdAt: string;
+    userId?: {
+        _id: string;
+        name: string;
+        email: string;
+    };
 }
 
 const HotelFeed: React.FC = () => {
     const [hotels, setHotels] = useState<Hotel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const { user, token } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchHotels();
@@ -40,6 +49,38 @@ const HotelFeed: React.FC = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleEdit = (hotelId: string) => {
+        navigate(`/edit-hotel/${hotelId}`);
+    };
+
+    const handleDelete = async (hotelId: string) => {
+        if (!window.confirm('Are you sure you want to delete this hotel?')) {
+            return;
+        }
+
+        try {
+            const response = await axios.delete(`http://localhost:5000/api/hotels/${hotelId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data.success) {
+                alert('Hotel deleted successfully!');
+                fetchHotels(); // Refresh the list
+            } else {
+                alert(response.data.message || 'Failed to delete hotel');
+            }
+        } catch (err: any) {
+            console.error('Error deleting hotel:', err);
+            alert(err.response?.data?.message || 'Failed to delete hotel');
+        }
+    };
+
+    const isOwner = (hotel: Hotel) => {
+        return user && hotel.userId && hotel.userId._id === user.id;
     };
 
     if (loading) {
@@ -94,7 +135,25 @@ const HotelFeed: React.FC = () => {
                                 )}
 
                                 <div className="p-6">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{hotel.name}</h3>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="text-xl font-bold text-gray-900">{hotel.name}</h3>
+                                        {isOwner(hotel) && (
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => handleEdit(hotel._id)}
+                                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(hotel._id)}
+                                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
 
                                     <div className="flex items-center text-gray-600 mb-3">
                                         <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -124,9 +183,14 @@ const HotelFeed: React.FC = () => {
                                             <span className="ml-2 text-sm text-gray-600">{hotel.rating}/5</span>
                                         </div>
 
-                                        <span className="text-xs text-gray-400">
-                                            {new Date(hotel.createdAt).toLocaleDateString()}
-                                        </span>
+                                        <div className="text-right">
+                                            <span className="text-xs text-gray-400 block">
+                                                {new Date(hotel.createdAt).toLocaleDateString()}
+                                            </span>
+                                            <span className="text-xs text-gray-500 block">
+                                                by {hotel.userId ? hotel.userId.name : 'Unknown User'}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

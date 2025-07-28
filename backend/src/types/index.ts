@@ -20,6 +20,7 @@ export interface AuthRequest extends Request {
 
 // Hotel types
 export interface IHotel extends Document {
+    userId?: Types.ObjectId;
     name: string;
     description: string;
     address: {

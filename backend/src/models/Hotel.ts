@@ -2,6 +2,11 @@ import mongoose, { Schema } from 'mongoose';
 import { IHotel } from '../types';
 
 const hotelSchema = new Schema<IHotel>({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: false // Make it optional to handle existing hotels
+    },
     name: {
         type: String,
         required: [true, 'Hotel name is required'],

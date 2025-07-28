@@ -5,6 +5,7 @@ import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
 import Dashboard from './components/Dashboard';
 import AddHotelForm from './components/AddHotelForm';
+import EditHotelForm from './components/EditHotelForm';
 import HotelFeed from './components/HotelFeed';
 import Footer from './components/Footer';
 
@@ -70,6 +71,7 @@ const AppRoutes: React.FC = () => {
               }
             />
             <Route path="/add-hotel" element={<ProtectedRoute><AddHotelForm /></ProtectedRoute>} />
+            <Route path="/edit-hotel/:hotelId" element={<ProtectedRoute><EditHotelForm /></ProtectedRoute>} />
             <Route path="/hotels" element={<ProtectedRoute><HotelFeed /></ProtectedRoute>} />
           </Routes>
         </main>

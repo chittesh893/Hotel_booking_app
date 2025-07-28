@@ -59,7 +59,7 @@ const AddHotelForm: React.FC = () => {
 
             if (response.data.success) {
                 alert('Hotel posted successfully!');
-                navigate('/dashboard');
+                navigate('/hotels');
             } else {
                 setError(response.data.message || 'Failed to post hotel');
             }
