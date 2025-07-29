@@ -52,6 +52,7 @@ const AddHotelForm: React.FC = () => {
 
             const response = await axios.post('http://localhost:5000/api/hotels', hotelData, {
                 headers: {
+                    
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }

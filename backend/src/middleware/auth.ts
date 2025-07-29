@@ -13,11 +13,13 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
             return res.status(401).json({
                 success: false,
                 error: 'Access denied. No token provided.'
+                
             });
         }
 
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
         const user = await User.findById(decoded.userId).select('-password');
+        const verify = await User.findById(decoded.userId).select('-password');
 
         if (!user) {
             return res.status(401).json({
