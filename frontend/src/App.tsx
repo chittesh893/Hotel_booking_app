@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './components/AuthContext';
+import LoadingSpinner from './components/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
 import Dashboard from './components/Dashboard';
@@ -15,8 +17,8 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner size="lg" text="Loading..." />
       </div>
     );
   }
@@ -24,28 +26,28 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-// Public Route Component (redirects to dashboard if already logged in)
+// Public Route Component (redirects to hotels if already logged in)
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner size="lg" text="Loading..." />
       </div>
     );
   }
 
-  return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
+  return user ? <Navigate to="/hotels" replace /> : <>{children}</>;
 };
 
 const AppRoutes: React.FC = () => {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gray-50">
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/hotels" replace />} />
             <Route
               path="/login"
               element={
@@ -70,9 +72,30 @@ const AppRoutes: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route path="/add-hotel" element={<ProtectedRoute><AddHotelForm /></ProtectedRoute>} />
-            <Route path="/edit-hotel/:hotelId" element={<ProtectedRoute><EditHotelForm /></ProtectedRoute>} />
-            <Route path="/hotels" element={<ProtectedRoute><HotelFeed /></ProtectedRoute>} />
+            <Route
+              path="/hotels"
+              element={
+                <ProtectedRoute>
+                  <HotelFeed />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/add-hotel"
+              element={
+                <ProtectedRoute>
+                  <AddHotelForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-hotel/:hotelId"
+              element={
+                <ProtectedRoute>
+                  <EditHotelForm />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
         <Footer />
@@ -83,9 +106,11 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 

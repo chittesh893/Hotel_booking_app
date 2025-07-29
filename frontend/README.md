@@ -1,16 +1,37 @@
-# Hotel Booking Frontend
+# HotelHub - Hotel Booking Application
 
-This is the frontend application for the Hotel Booking system with JWT authentication.
+A modern, responsive hotel booking application built with React, TypeScript, and Tailwind CSS.
 
-## Features
+## ✨ Features
 
-- User registration and login with JWT tokens
-- Protected routes with authentication
-- Modern UI with Tailwind CSS
-- Responsive design
-- Form validation
+### 🔍 Advanced Search & Filtering
+- **Text Search**: Search hotels by name, description, or amenities
+- **Location Filtering**: Filter by city, state, or country
+- **Rating Filter**: Filter by minimum rating (1-5 stars)
+- **Price Range**: Filter by maximum price
+- **Amenities Filter**: Filter by available amenities (WiFi, Pool, Gym, etc.)
+- **Sorting Options**: Sort by latest, rating, name, or price
+- **Pagination**: Navigate through search results efficiently
 
-## Getting Started
+### 🎨 Modern UI/UX
+- **Clean Design**: Minimalist, modern interface with smooth animations
+- **Responsive Layout**: Works perfectly on desktop, tablet, and mobile
+- **Interactive Elements**: Hover effects, loading states, and smooth transitions
+- **Card-based Layout**: Beautiful hotel cards with images and details
+- **Real-time Search**: Instant search results with loading indicators
+
+### 🔐 Authentication & Security
+- **JWT Authentication**: Secure login and registration
+- **Protected Routes**: User-specific content and actions
+- **Role-based Access**: Different permissions for users and admins
+
+### 📱 User Experience
+- **Sticky Navigation**: Always accessible header with user menu
+- **Loading States**: Smooth loading indicators throughout the app
+- **Error Handling**: Graceful error boundaries and user-friendly messages
+- **Mobile-First**: Optimized for mobile devices with touch-friendly interface
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -30,35 +51,103 @@ npm run dev
 
 3. Open your browser and navigate to `http://localhost:5173`
 
-## Available Routes
+## 📁 Project Structure
 
-- `/` - Redirects to login
-- `/login` - Login page
-- `/signup` - Registration page
-- `/dashboard` - Protected dashboard (requires authentication)
+```
+src/
+├── components/
+│   ├── AuthContext.tsx      # Authentication context
+│   ├── Header.tsx           # Navigation header
+│   ├── HotelFeed.tsx        # Main hotel listing with search
+│   ├── SearchBar.tsx        # Advanced search component
+│   ├── LoadingSpinner.tsx   # Reusable loading component
+│   ├── ErrorBoundary.tsx    # Error handling component
+│   └── ...                  # Other components
+├── App.tsx                  # Main application component
+└── main.tsx                 # Application entry point
+```
 
-## Testing the Authentication
+## 🎯 Key Components
 
-1. Start both backend and frontend servers
-2. Navigate to `/signup` to create a new account
-3. After successful registration, you'll be redirected to the dashboard
-4. Try accessing `/dashboard` directly - you should stay logged in
-5. Click logout to test the logout functionality
-6. Try accessing `/dashboard` again - you should be redirected to login
+### SearchBar
+- Advanced filtering with collapsible options
+- Real-time search with debouncing
+- Multiple filter types (text, location, rating, price, amenities)
+- Sort and pagination controls
 
-## Backend API Endpoints
+### HotelFeed
+- Responsive grid layout
+- Hotel cards with images, ratings, and details
+- Owner-specific actions (edit/delete)
+- Pagination for large result sets
 
-The frontend connects to these backend endpoints:
+### Header
+- Sticky navigation with user menu
+- Mobile-responsive design
+- Active route highlighting
 
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get current user info
+## 🛠️ Technologies Used
 
-## Technologies Used
+- **React 19** - Modern React with hooks
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first CSS framework
+- **React Router** - Client-side routing
+- **Axios** - HTTP client for API calls
+- **React Icons** - Beautiful icon library
 
-- React 19
-- TypeScript
-- React Router DOM
-- Axios for API calls
-- Tailwind CSS for styling
-- JWT for authentication
+## 🎨 Design System
+
+### Colors
+- **Primary**: Blue (#3B82F6)
+- **Secondary**: Gray (#6B7280)
+- **Success**: Green (#10B981)
+- **Error**: Red (#EF4444)
+- **Warning**: Yellow (#F59E0B)
+
+### Typography
+- **Headings**: Inter font family
+- **Body**: System font stack
+- **Responsive**: Scales appropriately across devices
+
+### Spacing
+- **Consistent**: 4px base unit system
+- **Responsive**: Adapts to screen size
+- **Accessible**: Proper touch targets and spacing
+
+## 🔧 Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+
+### Code Style
+
+- **ESLint** - Code linting and formatting
+- **TypeScript** - Strict type checking
+- **Prettier** - Code formatting (via ESLint)
+
+## 🚀 Deployment
+
+The application can be deployed to any static hosting service:
+
+1. Build the application:
+```bash
+npm run build
+```
+
+2. Deploy the `dist` folder to your hosting service
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.

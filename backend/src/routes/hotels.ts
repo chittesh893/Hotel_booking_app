@@ -79,6 +79,101 @@ router.post('/', auth, [
     }
 });
 
+// Search hotels with filters
+router.get('/search', async (req: Request, res: Response): Promise<void> => {
+    try {
+        const {
+            query,
+            city,
+            state,
+            country,
+            minRating,
+            maxPrice,
+            amenities,
+            sortBy = 'createdAt',
+            sortOrder = 'desc',
+            page = 1,
+            limit = 12
+        } = req.query;
+
+        // Build search query
+        const searchQuery: any = {};
+
+        // Text search across name and description
+        if (query) {
+            searchQuery.$or = [
+                { name: { $regex: query as string, $options: 'i' } },
+                { description: { $regex: query as string, $options: 'i' } }
+            ];
+        }
+
+        // Location filters
+        if (city) {
+            searchQuery['address.city'] = { $regex: city as string, $options: 'i' };
+        }
+        if (state) {
+            searchQuery['address.state'] = { $regex: state as string, $options: 'i' };
+        }
+        if (country) {
+            searchQuery['address.country'] = { $regex: country as string, $options: 'i' };
+        }
+
+        // Rating filter
+        if (minRating) {
+            searchQuery.rating = { $gte: parseFloat(minRating as string) };
+        }
+
+        // Price filter
+        if (maxPrice) {
+            searchQuery['priceRange.max'] = { $lte: parseFloat(maxPrice as string) };
+        }
+
+        // Amenities filter
+        if (amenities) {
+            const amenitiesArray = (amenities as string).split(',').map(a => a.trim());
+            searchQuery.amenities = { $in: amenitiesArray };
+        }
+
+        // Build sort object
+        const sortObject: any = {};
+        sortObject[sortBy as string] = sortOrder === 'desc' ? -1 : 1;
+
+        // Calculate pagination
+        const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+
+        // Execute query with pagination
+        const hotels = await Hotel.find(searchQuery)
+            .populate('userId', 'name email')
+            .sort(sortObject)
+            .skip(skip)
+            .limit(parseInt(limit as string));
+
+        // Get total count for pagination
+        const total = await Hotel.countDocuments(searchQuery);
+
+        res.json({
+            success: true,
+            message: 'Hotels retrieved successfully',
+            data: hotels,
+            pagination: {
+                currentPage: parseInt(page as string),
+                totalPages: Math.ceil(total / parseInt(limit as string)),
+                totalHotels: total,
+                hasNextPage: skip + hotels.length < total,
+                hasPrevPage: parseInt(page as string) > 1
+            }
+        });
+
+    } catch (error) {
+        console.error('Error searching hotels:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+
 // Get all hotels
 router.get('/', async (req: Request, res: Response): Promise<void> => {
     try {
