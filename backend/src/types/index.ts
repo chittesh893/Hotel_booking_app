@@ -39,6 +39,7 @@ export interface IHotel extends Document {
     };
     createdAt: Date;
     updatedAt: Date;
+    
 }
 
 // Room types
