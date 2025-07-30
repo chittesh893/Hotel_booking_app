@@ -11,11 +11,13 @@ interface SearchFilters {
     amenities: string[];
     sortBy: string;
     sortOrder: string;
+    
 }
 
 interface SearchBarProps {
     onSearch: (filters: SearchFilters) => void;
     isLoading?: boolean;
+    isIndex?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading = false }) => {
