@@ -19,7 +19,7 @@ const SignupForm: React.FC = () => {
             [e.target.name]: e.target.value
         });
     };
-   console.log(formData);
+    console.log(formData);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -165,6 +165,7 @@ const SignupForm: React.FC = () => {
                                 Sign in here
                             </a>
                         </p>
+                        <p>..</p>
                     </div>
                 </form>
             </div>
