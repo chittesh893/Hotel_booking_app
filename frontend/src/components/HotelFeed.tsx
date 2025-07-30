@@ -304,6 +304,7 @@ const HotelFeed: React.FC = () => {
                 </form>
             </div>
 
+
             {/* Hotel Feeds */}
             <div className="max-w-7xl mx-auto px-4 pb-12">
                 {error ? (

@@ -14,11 +14,13 @@ const PrivacyPolicy: React.FC = () => {
                             ← Back to Dashboard
                         </Link>
                     </div>
+                    
 
                     <h1 className="text-3xl font-bold text-gray-900 mb-6">Privacy Policy</h1>
                     <p className="text-gray-600 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
 
                     <div className="prose prose-lg max-w-none">
+                        <div> test</div>
                         <section className="mb-8">
                             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Information We Collect</h2>
                             <p className="text-gray-700 mb-4">
