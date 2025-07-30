@@ -10,6 +10,7 @@ import AddHotelForm from './components/AddHotelForm';
 import EditHotelForm from './components/EditHotelForm';
 import HotelFeed from './components/HotelFeed';
 import Footer from './components/Footer';
+import HomePage from './components/HomePage';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -47,7 +48,7 @@ const AppRoutes: React.FC = () => {
       <div className="min-h-screen flex flex-col bg-gray-50">
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Navigate to="/hotels" replace />} />
+            <Route path="/" element={<HomePage />} />
             <Route
               path="/login"
               element={
