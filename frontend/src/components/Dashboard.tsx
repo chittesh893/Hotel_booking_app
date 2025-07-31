@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 import Header from './Header';
 import HeroSection from './HeroSection';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
     const { user } = useAuth();
     const [searchResults, setSearchResults] = useState<string[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const navigate = useNavigate();
-
+   if(!user){
+    return <Navigate to="/login" />;
+   }
     const handleSearch = (query: string) => {
         setIsSearching(true);
         // Simulate search functionality
