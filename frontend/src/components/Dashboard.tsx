@@ -189,6 +189,11 @@ const Dashboard: React.FC = () => {
                             </div>
                         </button>
                     </div>
+                    <button className="group bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                        onClick={() => navigate('/login')}
+                    >
+                        <span className="font-medium">Logout</span>
+                    </button>
                 </div>
 
                 {/* Recent Activity */}

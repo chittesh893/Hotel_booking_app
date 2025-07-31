@@ -1,6 +1,13 @@
 import React from 'react';
 import SearchBar from './SearchBar';
 
+const cities = ['New York', 'London', 'Tokyo', 'Paris', 'Dubai', 'Bali'];
+const popularDestinations = ['New York', 'London', 'Tokyo', 'Paris', 'Dubai', 'Bali'];
+
+
+const title = "Find your perfect stay anywhere";
+const description = "Discover amazing hotels, resorts, and unique stays around the world. Book with confidence and create unforgettable memories.";
+
 const HeroSection: React.FC = () => {
     return (
         <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 min-h-[70vh] flex items-center overflow-hidden">
