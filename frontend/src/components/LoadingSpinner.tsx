@@ -16,8 +16,11 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     const sizeClasses = {
         sm: 'h-6 w-6',
         md: 'h-10 w-10',
-        lg: 'h-16 w-16'
+        lg: 'h-16 w-16',
+        xl: 'h-20 w-20'
     };
+
+ 
 
     const variantClasses = {
         default: 'border-blue-500',
