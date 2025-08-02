@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import auth from '../../middleware/auth';
+import { auth } from '../middleware/auth';
 import { AuthRequest } from '../types';
 import Hotel from '../models/Hotel';
 
