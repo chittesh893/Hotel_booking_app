@@ -241,8 +241,7 @@ const MyHotels: React.FC = () => {
                                                 <Button
                                                     onClick={() => navigate(`/hotels/${hotel._id}`)}
                                                     variant="outline"
-                                                    size="sm"
-                                                    className="flex items-center space-x-1"
+                                                    className="flex items-center space-x-1 px-4 py-2"
                                                 >
                                                     <Eye className="w-4 h-4" />
                                                     <span>View</span>
@@ -250,8 +249,7 @@ const MyHotels: React.FC = () => {
                                                 <Button
                                                     onClick={() => navigate(`/edit-hotel/${hotel._id}`)}
                                                     variant="outline"
-                                                    size="sm"
-                                                    className="flex items-center space-x-1"
+                                                    className="flex items-center space-x-1 px-4 py-2"
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                     <span>Edit</span>
@@ -259,8 +257,7 @@ const MyHotels: React.FC = () => {
                                                 <Button
                                                     onClick={() => setDeleteConfirm(hotel._id)}
                                                     variant="outline"
-                                                    size="sm"
-                                                    className="flex items-center space-x-1 text-red-600 border-red-600 hover:bg-red-50"
+                                                    className="flex items-center space-x-1 px-4 py-2 text-red-600 border-red-600 hover:bg-red-50"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                     <span>Delete</span>
@@ -284,14 +281,13 @@ const MyHotels: React.FC = () => {
                                                 <Button
                                                     onClick={() => setDeleteConfirm(null)}
                                                     variant="outline"
-                                                    size="sm"
+                                                    className="px-4 py-2"
                                                 >
                                                     Cancel
                                                 </Button>
                                                 <Button
                                                     onClick={() => handleDeleteHotel(hotel._id)}
-                                                    className="bg-red-600 hover:bg-red-700 text-white"
-                                                    size="sm"
+                                                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2"
                                                 >
                                                     Delete
                                                 </Button>

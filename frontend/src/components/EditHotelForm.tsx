@@ -1,56 +1,101 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { useEditHotelForm, handleFormError } from '../lib/hooks/useFormValidation';
+import { useNavigate, useParams } from 'react-router-dom';
 import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
+import { ArrowLeft } from 'lucide-react';
+import axios from 'axios';
 
 interface Hotel {
     _id: string;
     name: string;
     description: string;
-    address: {
-        street: string;
+    location: {
         city: string;
         state: string;
-        zipCode: string;
         country: string;
+        address: string;
     };
     images: string[];
-    userId?: {
-        _id: string;
-        name: string;
+    amenities: string[];
+    rating: number;
+    pricePerNight: number;
+    currency: string;
+    contact: {
+        phone: string;
         email: string;
+        website?: string;
     };
+    policies: {
+        checkIn: string;
+        checkOut: string;
+        cancellation: string;
+        pets: boolean;
+        smoking: boolean;
+    };
+    ownerId?: string;
 }
 
 const EditHotelForm: React.FC = () => {
-    const [hotel, setHotel] = useState<Hotel | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
     const navigate = useNavigate();
     const { hotelId } = useParams<{ hotelId: string }>();
-    const { user, token } = useAuth();
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-        setError,
-        setValue,
-        watch
-    } = useEditHotelForm();
-
-    const photoFile = watch('photo');
-
-    // Update preview when photo changes
-    useEffect(() => {
-        if (photoFile && photoFile[0]) {
-            setPreview(URL.createObjectURL(photoFile[0]));
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [hotel, setHotel] = useState<Hotel | null>(null);
+    
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        city: '',
+        state: '',
+        address: '',
+        images: ['https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'],
+        amenities: [] as string[],
+        rating: 4.0,
+        pricePerNight: 5000,
+        currency: 'INR',
+        contact: {
+            phone: '',
+            email: '',
+            website: ''
+        },
+        policies: {
+            checkIn: '2:00 PM',
+            checkOut: '11:00 AM',
+            cancellation: 'Free cancellation up to 24 hours before check-in',
+            pets: false,
+            smoking: false
         }
-    }, [photoFile]);
+    });
 
+    const handleInputChange = (field: string, value: any) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleContactChange = (field: string, value: string) => {
+        setFormData(prev => ({
+            ...prev,
+            contact: {
+                ...prev.contact,
+                [field]: value
+            }
+        }));
+    };
+
+    const handleAmenityToggle = (amenity: string) => {
+        setFormData(prev => ({
+            ...prev,
+            amenities: prev.amenities.includes(amenity)
+                ? prev.amenities.filter(a => a !== amenity)
+                : [...prev.amenities, amenity]
+        }));
+    };
+
+    // Fetch hotel data on component mount
     useEffect(() => {
         if (hotelId) {
             fetchHotel();
@@ -60,203 +105,272 @@ const EditHotelForm: React.FC = () => {
     const fetchHotel = async () => {
         try {
             const response = await axios.get(`http://localhost:5000/api/hotels/${hotelId}`);
+            
             if (response.data.success) {
-                const hotelData = response.data.data;
+                const hotelData = response.data.data.hotel;
                 setHotel(hotelData);
 
-                // Set form values
-                setValue('name', hotelData.name);
-                setValue('details', hotelData.description);
-                setValue('location', `${hotelData.address.street}, ${hotelData.address.city}, ${hotelData.address.state}, ${hotelData.address.zipCode}, ${hotelData.address.country}`);
-
-                if (hotelData.images && hotelData.images.length > 0) {
-                    setPreview(hotelData.images[0]);
-                }
-            } else {
-                handleFormError(setError, { response: { data: response.data } }, 'Failed to fetch hotel');
+                // Pre-fill form with existing data
+                setFormData({
+                    name: hotelData.name || '',
+                    description: hotelData.description || '',
+                    city: hotelData.location?.city || '',
+                    state: hotelData.location?.state || '',
+                    address: hotelData.location?.address || '',
+                    images: hotelData.images || ['https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'],
+                    amenities: hotelData.amenities || [],
+                    rating: hotelData.rating || 4.0,
+                    pricePerNight: hotelData.pricePerNight || 5000,
+                    currency: hotelData.currency || 'INR',
+                    contact: {
+                        phone: hotelData.contact?.phone || '',
+                        email: hotelData.contact?.email || '',
+                        website: hotelData.contact?.website || ''
+                    },
+                    policies: {
+                        checkIn: hotelData.policies?.checkIn || '2:00 PM',
+                        checkOut: hotelData.policies?.checkOut || '11:00 AM',
+                        cancellation: hotelData.policies?.cancellation || 'Free cancellation up to 24 hours before check-in',
+                        pets: hotelData.policies?.pets || false,
+                        smoking: hotelData.policies?.smoking || false
+                    }
+                });
             }
-        } catch (err: any) {
-            console.error('Error fetching hotel:', err);
-            handleFormError(setError, err, 'Failed to fetch hotel');
+        } catch (error: any) {
+            console.error('Error fetching hotel:', error);
+            alert('Failed to fetch hotel data');
         } finally {
             setLoading(false);
         }
     };
 
-    const convertToBase64 = (file: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = error => reject(error);
-        });
-    };
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!user || !hotelId) {
+            alert('Please log in to edit a hotel');
+            return;
+        }
 
-    const onSubmit = async (data: { name: string; location: string; details: string; photo?: FileList }) => {
+        setIsSubmitting(true);
+
         try {
-            if (!hotel) {
-                throw new Error('Hotel not found');
-            }
-
-            // Check if user owns the hotel
-            if (!hotel.userId) {
-                throw new Error('This hotel was created before user ownership was implemented');
-            }
-
-            if (hotel.userId._id !== user?.id) {
-                throw new Error('You can only edit hotels you created');
-            }
-
-            let photoBase64 = hotel.images[0]; // Use existing photo if no new one selected
-            if (data.photo && data.photo[0]) {
-                photoBase64 = await convertToBase64(data.photo[0]);
-            }
-
             const hotelData = {
-                name: data.name,
-                location: data.location,
-                details: data.details,
-                photo: photoBase64
+                ...formData,
+                location: {
+                    city: formData.city,
+                    state: formData.state,
+                    country: 'India',
+                    address: formData.address
+                },
+                roomTypes: [{
+                    name: 'Standard Room',
+                    description: 'Comfortable room with basic amenities',
+                    price: formData.pricePerNight,
+                    capacity: 2,
+                    available: 10
+                }]
             };
 
             const response = await axios.put(`http://localhost:5000/api/hotels/${hotelId}`, hotelData, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json'
                 }
             });
 
             if (response.data.success) {
                 alert('Hotel updated successfully!');
-                navigate('/hotels');
-            } else {
-                handleFormError(setError, { response: { data: response.data } }, 'Failed to update hotel');
+                navigate('/my-hotels');
             }
-        } catch (err: any) {
-            console.error('Error updating hotel:', err);
-            handleFormError(setError, err, 'Failed to update hotel');
+        } catch (error: any) {
+            console.error('Error updating hotel:', error);
+            alert(error.response?.data?.message || 'Failed to update hotel');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
+    const availableAmenities = ['WiFi', 'Parking', 'Restaurant', 'Pool', 'Gym', 'Spa'];
+
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-            </div>
-        );
-    }
-
-    if (errors.root && !hotel) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100">
-                <div className="text-center">
-                    <div className="text-red-600 text-xl mb-4">Error: {errors.root.message}</div>
-                    <FormButton
-                        onClick={() => navigate('/hotels')}
-                        variant="primary"
-                    >
-                        Back to Hotels
-                    </FormButton>
-                </div>
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
             </div>
         );
     }
 
     if (!hotel) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center">
                     <div className="text-gray-600 text-xl mb-4">Hotel not found</div>
-                    <FormButton
-                        onClick={() => navigate('/hotels')}
-                        variant="primary"
+                    <button
+                        onClick={() => navigate('/my-hotels')}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                     >
-                        Back to Hotels
-                    </FormButton>
+                        Back to My Hotels
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100 py-12 px-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg space-y-6">
-                <h2 className="text-3xl font-bold text-center text-indigo-700 mb-4">Edit Hotel</h2>
-
-                {errors.root && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-                        {errors.root.message}
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-white shadow-sm border-b">
+                <div className="max-w-4xl mx-auto px-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <button
+                                onClick={() => navigate('/my-hotels')}
+                                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>Back to My Hotels</span>
+                            </button>
+                        </div>
+                        <h1 className="text-2xl font-bold text-gray-900">Edit Hotel</h1>
+                        <div></div>
                     </div>
-                )}
-
-                <FormInput
-                    label="Hotel Photo"
-                    name="photo"
-                    type="file"
-                    accept="image/*"
-                    {...register('photo')}
-                />
-                <p className="text-sm text-gray-500 mt-1">Leave empty to keep current photo</p>
-                {preview && (
-                    <img src={preview} alt="Preview" className="mt-4 rounded-xl w-full h-48 object-cover border" />
-                )}
-
-                <FormInput
-                    label="Hotel Name"
-                    name="name"
-                    type="text"
-                    placeholder="Enter hotel name"
-                    error={errors.name}
-                    required
-                    {...register('name')}
-                />
-
-                <FormInput
-                    label="Location"
-                    name="location"
-                    type="text"
-                    placeholder="Street, City, State, ZipCode, Country"
-                    error={errors.location}
-                    required
-                    {...register('location')}
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                    Format: 123 Main St, New York, NY, 10001, USA
-                </p>
-
-                <FormInput
-                    label="Details"
-                    name="details"
-                    type="textarea"
-                    placeholder="Describe the hotel, amenities, etc."
-                    error={errors.details}
-                    rows={4}
-                    required
-                    {...register('details')}
-                />
-
-                <div className="flex space-x-4">
-                    <FormButton
-                        type="button"
-                        onClick={() => navigate('/hotels')}
-                        variant="secondary"
-                        className="flex-1"
-                        size="lg"
-                    >
-                        Cancel
-                    </FormButton>
-                    <FormButton
-                        type="submit"
-                        disabled={isSubmitting}
-                        loading={isSubmitting}
-                        loadingText="Updating..."
-                        className="flex-1"
-                        size="lg"
-                    >
-                        Update Hotel
-                    </FormButton>
                 </div>
-            </form>
+            </div>
+
+            <div className="max-w-4xl mx-auto px-4 py-8">
+                <div className="bg-white rounded-lg shadow-sm border p-8">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Basic Information */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormInput
+                                    label="Hotel Name"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={(e) => handleInputChange('name', e.target.value)}
+                                    placeholder="Enter hotel name"
+                                    required
+                                />
+                                <FormInput
+                                    label="Price per Night (INR)"
+                                    name="pricePerNight"
+                                    type="number"
+                                    value={formData.pricePerNight}
+                                    onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
+                                    placeholder="5000"
+                                    required
+                                />
+                            </div>
+                            <div className="mt-4">
+                                <FormInput
+                                    label="Description"
+                                    name="description"
+                                    type="textarea"
+                                    value={formData.description}
+                                    onChange={(e) => handleInputChange('description', e.target.value)}
+                                    placeholder="Describe your hotel..."
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {/* Location */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Location</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormInput
+                                    label="City"
+                                    name="city"
+                                    value={formData.city}
+                                    onChange={(e) => handleInputChange('city', e.target.value)}
+                                    placeholder="Enter city"
+                                    required
+                                />
+                                <FormInput
+                                    label="State"
+                                    name="state"
+                                    value={formData.state}
+                                    onChange={(e) => handleInputChange('state', e.target.value)}
+                                    placeholder="Enter state"
+                                    required
+                                />
+                            </div>
+                            <div className="mt-4">
+                                <FormInput
+                                    label="Address"
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={(e) => handleInputChange('address', e.target.value)}
+                                    placeholder="Enter full address"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {/* Contact Information */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormInput
+                                    label="Phone Number"
+                                    name="phone"
+                                    value={formData.contact.phone}
+                                    onChange={(e) => handleContactChange('phone', e.target.value)}
+                                    placeholder="+91-1234567890"
+                                    required
+                                />
+                                <FormInput
+                                    label="Email"
+                                    name="email"
+                                    type="email"
+                                    value={formData.contact.email}
+                                    onChange={(e) => handleContactChange('email', e.target.value)}
+                                    placeholder="info@hotel.com"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {/* Amenities */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Amenities</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {availableAmenities.map(amenity => (
+                                    <label key={amenity} className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.amenities.includes(amenity)}
+                                            onChange={() => handleAmenityToggle(amenity)}
+                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <span className="text-sm text-gray-700">{amenity}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="flex items-center justify-end space-x-4 pt-6 border-t">
+                            <button
+                                type="button"
+                                onClick={() => navigate('/my-hotels')}
+                                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <FormButton
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                                {isSubmitting ? 'Updating Hotel...' : 'Update Hotel'}
+                            </FormButton>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 };

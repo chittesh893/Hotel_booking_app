@@ -219,6 +219,36 @@ router.get('/my-hotels', auth, async (req: AuthRequest, res: Response): Promise<
     }
 });
 
+// Get a single hotel by ID
+router.get('/:id', async (req: Request, res: Response): Promise<void> => {
+    try {
+        const hotelId = req.params.id;
+
+        const hotel = await Hotel.findById(hotelId).populate('ownerId', 'name email');
+
+        if (!hotel) {
+            res.status(404).json({
+                success: false,
+                message: 'Hotel not found'
+            });
+            return;
+        }
+
+        res.json({
+            success: true,
+            data: { hotel }
+        });
+
+    } catch (error) {
+        console.error('Error fetching hotel:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+
 // Update hotel (only by owner)
 router.put('/:id', auth, [
     body('name').notEmpty().withMessage('Hotel name is required'),
@@ -367,57 +397,6 @@ router.delete('/:id', auth, async (req: AuthRequest, res: Response): Promise<voi
 
     } catch (error) {
         console.error('Error deleting hotel:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-            error: error instanceof Error ? error.message : 'Unknown error'
-        });
-    }
-});
-
-// Get user's own hotels
-router.get('/my-hotels', auth, async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-        const hotels = await Hotel.find({ ownerId: req.user!._id })
-            .sort({ createdAt: -1 });
-
-        res.json({
-            success: true,
-            data: { hotels }
-        });
-
-    } catch (error) {
-        console.error('Error fetching user hotels:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-            error: error instanceof Error ? error.message : 'Unknown error'
-        });
-    }
-});
-
-// Get a single hotel by ID
-router.get('/:id', async (req: Request, res: Response): Promise<void> => {
-    try {
-        const hotelId = req.params.id;
-
-        const hotel = await Hotel.findById(hotelId).populate('ownerId', 'name email');
-
-        if (!hotel) {
-            res.status(404).json({
-                success: false,
-                message: 'Hotel not found'
-            });
-            return;
-        }
-
-        res.json({
-            success: true,
-            data: { hotel }
-        });
-
-    } catch (error) {
-        console.error('Error fetching hotel:', error);
         res.status(500).json({
             success: false,
             message: 'Internal server error',

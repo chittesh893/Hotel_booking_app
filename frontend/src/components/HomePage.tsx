@@ -51,12 +51,12 @@ export default function HomePage() {
                                 <div className="text-sm text-green-700">{successMessage}</div>
                             </div>
                             <div className="flex items-center space-x-2 ml-4">
-                                                                 <Button
-                                     onClick={() => navigate('/my-hotels')}
-                                     className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm"
-                                 >
-                                     View My Hotels
-                                 </Button>
+                                <Button
+                                    onClick={() => navigate('/my-hotels')}
+                                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                                >
+                                    View My Hotels
+                                </Button>
                                 <button
                                     onClick={() => setShowSuccess(false)}
                                     className="text-green-400 hover:text-green-600"
@@ -86,12 +86,6 @@ export default function HomePage() {
                                 <div className="flex items-center space-x-2 text-white">
                                     <span>Welcome, {user.name}!</span>
                                 </div>
-                                <Button
-                                    onClick={() => navigate('/my-hotels')}
-                                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-                                >
-                                    My Hotels
-                                </Button>
                                 <Button
                                     onClick={() => navigate('/my-hotels')}
                                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
@@ -312,6 +306,17 @@ export default function HomePage() {
                         )}
                     </div>
 
+                    {/* Hotel Feed Section - Right after search */}
+                    <div className="mb-16">
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold text-white mb-4">Discover Amazing Hotels</h2>
+                            <p className="text-xl text-gray-300">Find your perfect stay with our curated collection</p>
+                        </div>
+                        <div className="bg-white rounded-lg shadow-lg p-6">
+                            <HotelFeed />
+                        </div>
+                    </div>
+
                     {/* Welcome Section */}
                     <div className="mb-16 text-center">
                         <div className="text-white">
@@ -366,16 +371,7 @@ export default function HomePage() {
                 </div>
             </div>
 
-            {/* Hotel Feed Section */}
-            <div className="bg-gray-50 py-16">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Discover Amazing Hotels</h2>
-                        <p className="text-xl text-gray-600">Find your perfect stay with our curated collection</p>
-                    </div>
-                    <HotelFeed />
-                </div>
-            </div>
+
         </div>
     )
 }
