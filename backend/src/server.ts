@@ -1,10 +1,10 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/database';
+import connectDB from '../config/database';
 import authRouter from './routes/auth';
 import hotelsRouter from './routes/hotels';
-import { auth } from './middleware/auth';
+import auth from '../middleware/auth';
 import { AuthRequest } from './types';
 
 // Load environment variables
