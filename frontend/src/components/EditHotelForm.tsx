@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { useEditHotelForm, handleFormError } from '../lib/hooks/useFormValidation';
+import FormInput from './ui/FormInput';
+import FormButton from './ui/FormButton';
 
 interface Hotel {
     _id: string;
@@ -24,17 +27,29 @@ interface Hotel {
 
 const EditHotelForm: React.FC = () => {
     const [hotel, setHotel] = useState<Hotel | null>(null);
-    const [hotelName, setHotelName] = useState('');
-    const [location, setLocation] = useState('');
-    const [details, setDetails] = useState('');
-    const [photo, setPhoto] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
-    const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const navigate = useNavigate();
     const { hotelId } = useParams<{ hotelId: string }>();
     const { user, token } = useAuth();
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+        setError,
+        setValue,
+        watch
+    } = useEditHotelForm();
+
+    const photoFile = watch('photo');
+
+    // Update preview when photo changes
+    useEffect(() => {
+        if (photoFile && photoFile[0]) {
+            setPreview(URL.createObjectURL(photoFile[0]));
+        }
+    }, [photoFile]);
 
     useEffect(() => {
         if (hotelId) {
@@ -48,27 +63,23 @@ const EditHotelForm: React.FC = () => {
             if (response.data.success) {
                 const hotelData = response.data.data;
                 setHotel(hotelData);
-                setHotelName(hotelData.name);
-                setDetails(hotelData.description);
-                setLocation(`${hotelData.address.street}, ${hotelData.address.city}, ${hotelData.address.state}, ${hotelData.address.zipCode}, ${hotelData.address.country}`);
+
+                // Set form values
+                setValue('name', hotelData.name);
+                setValue('details', hotelData.description);
+                setValue('location', `${hotelData.address.street}, ${hotelData.address.city}, ${hotelData.address.state}, ${hotelData.address.zipCode}, ${hotelData.address.country}`);
+
                 if (hotelData.images && hotelData.images.length > 0) {
                     setPreview(hotelData.images[0]);
                 }
             } else {
-                setError('Failed to fetch hotel');
+                handleFormError(setError, { response: { data: response.data } }, 'Failed to fetch hotel');
             }
         } catch (err: any) {
             console.error('Error fetching hotel:', err);
-            setError(err.response?.data?.message || 'Failed to fetch hotel');
+            handleFormError(setError, err, 'Failed to fetch hotel');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setPhoto(e.target.files[0]);
-            setPreview(URL.createObjectURL(e.target.files[0]));
         }
     };
 
@@ -81,11 +92,7 @@ const EditHotelForm: React.FC = () => {
         });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSubmitting(true);
-        setError('');
-
+    const onSubmit = async (data: { name: string; location: string; details: string; photo?: FileList }) => {
         try {
             if (!hotel) {
                 throw new Error('Hotel not found');
@@ -101,14 +108,14 @@ const EditHotelForm: React.FC = () => {
             }
 
             let photoBase64 = hotel.images[0]; // Use existing photo if no new one selected
-            if (photo) {
-                photoBase64 = await convertToBase64(photo);
+            if (data.photo && data.photo[0]) {
+                photoBase64 = await convertToBase64(data.photo[0]);
             }
 
             const hotelData = {
-                name: hotelName,
-                location: location,
-                details: details,
+                name: data.name,
+                location: data.location,
+                details: data.details,
                 photo: photoBase64
             };
 
@@ -123,13 +130,11 @@ const EditHotelForm: React.FC = () => {
                 alert('Hotel updated successfully!');
                 navigate('/hotels');
             } else {
-                setError(response.data.message || 'Failed to update hotel');
+                handleFormError(setError, { response: { data: response.data } }, 'Failed to update hotel');
             }
         } catch (err: any) {
             console.error('Error updating hotel:', err);
-            setError(err.response?.data?.message || err.message || 'Failed to update hotel');
-        } finally {
-            setSubmitting(false);
+            handleFormError(setError, err, 'Failed to update hotel');
         }
     };
 
@@ -141,17 +146,17 @@ const EditHotelForm: React.FC = () => {
         );
     }
 
-    if (error && !hotel) {
+    if (errors.root && !hotel) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100">
                 <div className="text-center">
-                    <div className="text-red-600 text-xl mb-4">Error: {error}</div>
-                    <button
+                    <div className="text-red-600 text-xl mb-4">Error: {errors.root.message}</div>
+                    <FormButton
                         onClick={() => navigate('/hotels')}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+                        variant="primary"
                     >
                         Back to Hotels
-                    </button>
+                    </FormButton>
                 </div>
             </div>
         );
@@ -162,12 +167,12 @@ const EditHotelForm: React.FC = () => {
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100">
                 <div className="text-center">
                     <div className="text-gray-600 text-xl mb-4">Hotel not found</div>
-                    <button
+                    <FormButton
                         onClick={() => navigate('/hotels')}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+                        variant="primary"
                     >
                         Back to Hotels
-                    </button>
+                    </FormButton>
                 </div>
             </div>
         );
@@ -175,83 +180,81 @@ const EditHotelForm: React.FC = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100 py-12 px-4">
-            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg space-y-6">
                 <h2 className="text-3xl font-bold text-center text-indigo-700 mb-4">Edit Hotel</h2>
 
-                {error && (
+                {errors.root && (
                     <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-                        {error}
+                        {errors.root.message}
                     </div>
                 )}
 
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">Hotel Photo</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoChange}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">Leave empty to keep current photo</p>
-                    {preview && (
-                        <img src={preview} alt="Preview" className="mt-4 rounded-xl w-full h-48 object-cover border" />
-                    )}
-                </div>
+                <FormInput
+                    label="Hotel Photo"
+                    name="photo"
+                    type="file"
+                    accept="image/*"
+                    {...register('photo')}
+                />
+                <p className="text-sm text-gray-500 mt-1">Leave empty to keep current photo</p>
+                {preview && (
+                    <img src={preview} alt="Preview" className="mt-4 rounded-xl w-full h-48 object-cover border" />
+                )}
 
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">Hotel Name</label>
-                    <input
-                        type="text"
-                        value={hotelName}
-                        onChange={e => setHotelName(e.target.value)}
-                        required
-                        className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                        placeholder="Enter hotel name"
-                    />
-                </div>
+                <FormInput
+                    label="Hotel Name"
+                    name="name"
+                    type="text"
+                    placeholder="Enter hotel name"
+                    error={errors.name}
+                    required
+                    {...register('name')}
+                />
 
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">Location</label>
-                    <input
-                        type="text"
-                        value={location}
-                        onChange={e => setLocation(e.target.value)}
-                        required
-                        className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                        placeholder="Street, City, State, ZipCode, Country"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                        Format: 123 Main St, New York, NY, 10001, USA
-                    </p>
-                </div>
+                <FormInput
+                    label="Location"
+                    name="location"
+                    type="text"
+                    placeholder="Street, City, State, ZipCode, Country"
+                    error={errors.location}
+                    required
+                    {...register('location')}
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                    Format: 123 Main St, New York, NY, 10001, USA
+                </p>
 
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">Details</label>
-                    <textarea
-                        value={details}
-                        onChange={e => setDetails(e.target.value)}
-                        required
-                        className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                        placeholder="Describe the hotel, amenities, etc."
-                        rows={4}
-                    />
-                </div>
+                <FormInput
+                    label="Details"
+                    name="details"
+                    type="textarea"
+                    placeholder="Describe the hotel, amenities, etc."
+                    error={errors.details}
+                    rows={4}
+                    required
+                    {...register('details')}
+                />
 
                 <div className="flex space-x-4">
-                    <button
+                    <FormButton
                         type="button"
                         onClick={() => navigate('/hotels')}
-                        className="flex-1 py-3 rounded-xl bg-gray-500 text-white font-bold text-lg hover:bg-gray-600 transition-all duration-200"
+                        variant="secondary"
+                        className="flex-1"
+                        size="lg"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </FormButton>
+                    <FormButton
                         type="submit"
-                        disabled={submitting}
-                        className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition-all duration-200 disabled:opacity-50"
+                        disabled={isSubmitting}
+                        loading={isSubmitting}
+                        loadingText="Updating..."
+                        className="flex-1"
+                        size="lg"
                     >
-                        {submitting ? 'Updating...' : 'Update Hotel'}
-                    </button>
+                        Update Hotel
+                    </FormButton>
                 </div>
             </form>
         </div>
