@@ -1,40 +1,34 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
-import { Hotel, HOTEL_AMENITIES, ROOM_TYPES } from '../lib/constants';
+import { useNavigate } from 'react-router-dom';
 import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
-import { Plus, X, Upload } from 'lucide-react';
+import { Plus, X, ArrowLeft } from 'lucide-react';
+import axios from 'axios';
 
 interface AddHotelFormProps {
-    onSuccess?: (hotel: Hotel) => void;
+    onSuccess?: () => void;
     onCancel?: () => void;
 }
 
 const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         city: '',
         state: '',
-        country: 'India',
         address: '',
-        images: [''],
-        amenities: [] as string[],
+        images: ['https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'],
+        amenities: ['WiFi', 'Parking'],
         rating: 4.0,
         pricePerNight: 5000,
         currency: 'INR',
-        roomTypes: [{
-            name: 'Standard Room',
-            description: '',
-            price: 5000,
-            capacity: 2,
-            available: 10
-        }],
         contact: {
             phone: '',
-            email: '',
+            email: user?.email || '',
             website: ''
         },
         policies: {
@@ -53,31 +47,11 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
         }));
     };
 
-    const handleLocationChange = (field: string, value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            location: {
-                ...prev.location,
-                [field]: value
-            }
-        }));
-    };
-
     const handleContactChange = (field: string, value: string) => {
         setFormData(prev => ({
             ...prev,
             contact: {
                 ...prev.contact,
-                [field]: value
-            }
-        }));
-    };
-
-    const handlePolicyChange = (field: string, value: any) => {
-        setFormData(prev => ({
-            ...prev,
-            policies: {
-                ...prev.policies,
                 [field]: value
             }
         }));
@@ -92,114 +66,83 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
         }));
     };
 
-    const addRoomType = () => {
-        setFormData(prev => ({
-            ...prev,
-            roomTypes: [...prev.roomTypes, {
-                name: 'New Room Type',
-                description: '',
-                price: 5000,
-                capacity: 2,
-                available: 10
-            }]
-        }));
-    };
-
-    const updateRoomType = (index: number, field: string, value: any) => {
-        setFormData(prev => ({
-            ...prev,
-            roomTypes: prev.roomTypes.map((room, i) => 
-                i === index ? { ...room, [field]: value } : room
-            )
-        }));
-    };
-
-    const removeRoomType = (index: number) => {
-        setFormData(prev => ({
-            ...prev,
-            roomTypes: prev.roomTypes.filter((_, i) => i !== index)
-        }));
-    };
-
-    const addImage = () => {
-        setFormData(prev => ({
-            ...prev,
-            images: [...prev.images, '']
-        }));
-    };
-
-    const updateImage = (index: number, value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            images: prev.images.map((img, i) => i === index ? value : img)
-        }));
-    };
-
-    const removeImage = (index: number) => {
-        setFormData(prev => ({
-            ...prev,
-            images: prev.images.filter((_, i) => i !== index)
-        }));
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!user) {
+            alert('Please log in to add a hotel');
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
-            // Create hotel object
-            const hotelData: Omit<Hotel, '_id' | 'createdAt' | 'updatedAt'> = {
-                name: formData.name,
-                description: formData.description,
+            const hotelData = {
+                ...formData,
                 location: {
                     city: formData.city,
                     state: formData.state,
-                    country: formData.country,
+                    country: 'India',
                     address: formData.address
                 },
-                images: formData.images.filter(img => img.trim() !== ''),
-                amenities: formData.amenities,
-                rating: formData.rating,
-                pricePerNight: formData.pricePerNight,
-                currency: formData.currency,
-                roomTypes: formData.roomTypes,
-                contact: formData.contact,
-                policies: formData.policies,
-                ownerId: user?._id
+                roomTypes: [{
+                    name: 'Standard Room',
+                    description: 'Comfortable room with basic amenities',
+                    price: formData.pricePerNight,
+                    capacity: 2,
+                    available: 10
+                }]
             };
 
-            // Here you would typically make an API call to save the hotel
-            // For now, we'll just simulate success
-            console.log('Hotel data to save:', hotelData);
-            
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            onSuccess?.(hotelData as Hotel);
-        } catch (error) {
+            const response = await axios.post('http://localhost:5000/api/hotels', hotelData, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.data.success) {
+                alert('Hotel added successfully!');
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    navigate('/my-hotels');
+                }
+            }
+        } catch (error: any) {
             console.error('Error adding hotel:', error);
+            alert(error.response?.data?.message || 'Failed to add hotel');
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    const availableAmenities = ['WiFi', 'Parking', 'Restaurant', 'Pool', 'Gym', 'Spa'];
+
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-4xl mx-auto px-4">
-                <div className="bg-white rounded-lg shadow-sm">
-                    <div className="px-6 py-4 border-b border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-gray-900">Add New Hotel</h2>
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-white shadow-sm border-b">
+                <div className="max-w-4xl mx-auto px-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
                             <button
-                                onClick={onCancel}
-                                className="text-gray-400 hover:text-gray-600"
+                                onClick={() => navigate('/my-hotels')}
+                                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
                             >
-                                <X className="w-6 h-6" />
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>Back to My Hotels</span>
                             </button>
                         </div>
+                        <h1 className="text-2xl font-bold text-gray-900">Add New Hotel</h1>
+                        <div></div>
                     </div>
+                </div>
+            </div>
 
-                    <form onSubmit={handleSubmit} className="p-6 space-y-8">
+            <div className="max-w-4xl mx-auto px-4 py-8">
+                <div className="bg-white rounded-lg shadow-sm border p-8">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Basic Information */}
                         <div>
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
@@ -207,17 +150,29 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                 <FormInput
                                     label="Hotel Name"
                                     name="name"
-                                    type="text"
                                     value={formData.name}
                                     onChange={(e) => handleInputChange('name', e.target.value)}
+                                    placeholder="Enter hotel name"
                                     required
                                 />
+                                <FormInput
+                                    label="Price per Night (INR)"
+                                    name="pricePerNight"
+                                    type="number"
+                                    value={formData.pricePerNight}
+                                    onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
+                                    placeholder="5000"
+                                    required
+                                />
+                            </div>
+                            <div className="mt-4">
                                 <FormInput
                                     label="Description"
                                     name="description"
                                     type="textarea"
                                     value={formData.description}
                                     onChange={(e) => handleInputChange('description', e.target.value)}
+                                    placeholder="Describe your hotel..."
                                     required
                                 />
                             </div>
@@ -226,211 +181,46 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                         {/* Location */}
                         <div>
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Location</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormInput
                                     label="City"
                                     name="city"
-                                    type="text"
                                     value={formData.city}
-                                    onChange={(e) => handleLocationChange('city', e.target.value)}
+                                    onChange={(e) => handleInputChange('city', e.target.value)}
+                                    placeholder="Enter city"
                                     required
                                 />
                                 <FormInput
                                     label="State"
                                     name="state"
-                                    type="text"
                                     value={formData.state}
-                                    onChange={(e) => handleLocationChange('state', e.target.value)}
-                                    required
-                                />
-                                <FormInput
-                                    label="Country"
-                                    name="country"
-                                    type="text"
-                                    value={formData.country}
-                                    onChange={(e) => handleLocationChange('country', e.target.value)}
+                                    onChange={(e) => handleInputChange('state', e.target.value)}
+                                    placeholder="Enter state"
                                     required
                                 />
                             </div>
                             <div className="mt-4">
                                 <FormInput
-                                    label="Full Address"
+                                    label="Address"
                                     name="address"
-                                    type="text"
                                     value={formData.address}
-                                    onChange={(e) => handleLocationChange('address', e.target.value)}
+                                    onChange={(e) => handleInputChange('address', e.target.value)}
+                                    placeholder="Enter full address"
                                     required
                                 />
-                            </div>
-                        </div>
-
-                        {/* Images */}
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Images</h3>
-                            <div className="space-y-3">
-                                {formData.images.map((image, index) => (
-                                    <div key={index} className="flex gap-2">
-                                        <input
-                                            type="url"
-                                            placeholder="Image URL"
-                                            value={image}
-                                            onChange={(e) => updateImage(index, e.target.value)}
-                                            className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                        {formData.images.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(index)}
-                                                className="px-3 py-2 text-red-600 hover:text-red-800"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={addImage}
-                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    Add Image URL
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Pricing */}
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <FormInput
-                                    label="Price per Night (₹)"
-                                    name="pricePerNight"
-                                    type="number"
-                                    value={formData.pricePerNight}
-                                    onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
-                                    required
-                                />
-                                <FormInput
-                                    label="Rating"
-                                    name="rating"
-                                    type="number"
-                                    min="0"
-                                    max="5"
-                                    step="0.1"
-                                    value={formData.rating}
-                                    onChange={(e) => handleInputChange('rating', parseFloat(e.target.value))}
-                                    required
-                                />
-                                <FormInput
-                                    label="Currency"
-                                    name="currency"
-                                    type="text"
-                                    value={formData.currency}
-                                    onChange={(e) => handleInputChange('currency', e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        {/* Amenities */}
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Amenities</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                {HOTEL_AMENITIES.slice(0, 20).map(amenity => (
-                                    <label key={amenity} className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.amenities.includes(amenity)}
-                                            onChange={() => handleAmenityToggle(amenity)}
-                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                        />
-                                        <span className="ml-2 text-sm text-gray-700">{amenity}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Room Types */}
-                        <div>
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900">Room Types</h3>
-                                <button
-                                    type="button"
-                                    onClick={addRoomType}
-                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    Add Room Type
-                                </button>
-                            </div>
-                            <div className="space-y-4">
-                                {formData.roomTypes.map((room, index) => (
-                                    <div key={index} className="border border-gray-200 rounded-lg p-4">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <h4 className="font-medium text-gray-900">Room Type {index + 1}</h4>
-                                            {formData.roomTypes.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeRoomType(index)}
-                                                    className="text-red-600 hover:text-red-800"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            )}
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <input
-                                                type="text"
-                                                placeholder="Room Type Name"
-                                                value={room.name}
-                                                onChange={(e) => updateRoomType(index, 'name', e.target.value)}
-                                                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                            <input
-                                                type="number"
-                                                placeholder="Price"
-                                                value={room.price}
-                                                onChange={(e) => updateRoomType(index, 'price', parseInt(e.target.value))}
-                                                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                            <input
-                                                type="number"
-                                                placeholder="Capacity"
-                                                value={room.capacity}
-                                                onChange={(e) => updateRoomType(index, 'capacity', parseInt(e.target.value))}
-                                                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                            <input
-                                                type="number"
-                                                placeholder="Available Rooms"
-                                                value={room.available}
-                                                onChange={(e) => updateRoomType(index, 'available', parseInt(e.target.value))}
-                                                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </div>
-                                        <textarea
-                                            placeholder="Room Description"
-                                            value={room.description}
-                                            onChange={(e) => updateRoomType(index, 'description', e.target.value)}
-                                            className="mt-3 w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                            rows={2}
-                                        />
-                                    </div>
-                                ))}
                             </div>
                         </div>
 
                         {/* Contact Information */}
                         <div>
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormInput
-                                    label="Phone"
+                                    label="Phone Number"
                                     name="phone"
-                                    type="tel"
                                     value={formData.contact.phone}
                                     onChange={(e) => handleContactChange('phone', e.target.value)}
+                                    placeholder="+91-1234567890"
                                     required
                                 />
                                 <FormInput
@@ -439,76 +229,35 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     type="email"
                                     value={formData.contact.email}
                                     onChange={(e) => handleContactChange('email', e.target.value)}
+                                    placeholder="info@hotel.com"
                                     required
-                                />
-                                <FormInput
-                                    label="Website (Optional)"
-                                    name="website"
-                                    type="url"
-                                    value={formData.contact.website}
-                                    onChange={(e) => handleContactChange('website', e.target.value)}
                                 />
                             </div>
                         </div>
 
-                        {/* Policies */}
+                        {/* Amenities */}
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Policies</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormInput
-                                    label="Check-in Time"
-                                    name="checkIn"
-                                    type="text"
-                                    value={formData.policies.checkIn}
-                                    onChange={(e) => handlePolicyChange('checkIn', e.target.value)}
-                                    required
-                                />
-                                <FormInput
-                                    label="Check-out Time"
-                                    name="checkOut"
-                                    type="text"
-                                    value={formData.policies.checkOut}
-                                    onChange={(e) => handlePolicyChange('checkOut', e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="mt-4">
-                                <FormInput
-                                    label="Cancellation Policy"
-                                    name="cancellation"
-                                    type="textarea"
-                                    value={formData.policies.cancellation}
-                                    onChange={(e) => handlePolicyChange('cancellation', e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <label className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.policies.pets}
-                                        onChange={(e) => handlePolicyChange('pets', e.target.checked)}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    />
-                                    <span className="ml-2 text-sm text-gray-700">Pet Friendly</span>
-                                </label>
-                                <label className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.policies.smoking}
-                                        onChange={(e) => handlePolicyChange('smoking', e.target.checked)}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    />
-                                    <span className="ml-2 text-sm text-gray-700">Smoking Allowed</span>
-                                </label>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Amenities</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {availableAmenities.map(amenity => (
+                                    <label key={amenity} className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.amenities.includes(amenity)}
+                                            onChange={() => handleAmenityToggle(amenity)}
+                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <span className="text-sm text-gray-700">{amenity}</span>
+                                    </label>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Submit Buttons */}
-                        <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                        {/* Submit Button */}
+                        <div className="flex items-center justify-end space-x-4 pt-6 border-t">
                             <button
                                 type="button"
-                                onClick={onCancel}
+                                onClick={() => navigate('/my-hotels')}
                                 className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                             >
                                 Cancel
@@ -516,11 +265,9 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                             <FormButton
                                 type="submit"
                                 disabled={isSubmitting}
-                                loading={isSubmitting}
-                                loadingText="Adding Hotel..."
-                                className="px-6 py-2"
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
-                                Add Hotel
+                                {isSubmitting ? 'Adding Hotel...' : 'Add Hotel'}
                             </FormButton>
                         </div>
                     </form>

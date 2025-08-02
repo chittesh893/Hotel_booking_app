@@ -14,14 +14,62 @@ import {
 import * as Dialog from '@radix-ui/react-dialog'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
+import SuccessMessage from './ui/SuccessMessage'
+import HotelFeed from './HotelFeed'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from './AuthContext'
 
 export default function HomePage() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
     const [isSignupModalOpen, setIsSignupModalOpen] = useState(false)
     const [activeTab, setActiveTab] = useState('hotels')
+    const [showSuccess, setShowSuccess] = useState(false)
+    const [successMessage, setSuccessMessage] = useState('')
+    const navigate = useNavigate()
+    const { user, logout } = useAuth()
+
+    const handleAuthSuccess = (message: string) => {
+        setSuccessMessage(message);
+        setShowSuccess(true);
+        setIsLoginModalOpen(false);
+        setIsSignupModalOpen(false);
+
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+            setShowSuccess(false);
+        }, 5000);
+    };
 
     return (
         <div className="min-h-screen bg-gray-900">
+            {/* Success Message */}
+            {showSuccess && (
+                <div className="fixed top-4 right-4 z-50">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 shadow-lg">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <div className="text-sm text-green-700">{successMessage}</div>
+                            </div>
+                            <div className="flex items-center space-x-2 ml-4">
+                                                                 <Button
+                                     onClick={() => navigate('/my-hotels')}
+                                     className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm"
+                                 >
+                                     View My Hotels
+                                 </Button>
+                                <button
+                                    onClick={() => setShowSuccess(false)}
+                                    className="text-green-400 hover:text-green-600"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Header section remains the same */}
             <header className="bg-gray-800 px-4 py-3">
                 {/* ... header content remains the same ... */}
@@ -33,47 +81,112 @@ export default function HomePage() {
                     </div>
 
                     <div className="flex items-center space-x-6 text-sm">
-                        <div className="flex items-center space-x-2 text-white">
-                            <Home className="w-4 h-4" />
-                            <span>List Your Property</span>
-                            <span className="text-gray-400">Grow your business</span>
-                        </div>
-
-                        <div className="flex items-center space-x-2 text-white">
-                            <FileText className="w-4 h-4" />
-                            <span>My Trips</span>
-                            <span className="text-gray-400">Manage your bookings</span>
-                        </div>
-
-                        <Dialog.Root open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen}>
-                            <Dialog.Trigger asChild>
-                                <Button className="bg-blue-500 text-white px-4 py-2 rounded flex items-center space-x-2">
-                                    <span>Login or Create Account</span>
-                                    <ChevronDown className="w-4 h-4" />
+                        {user ? (
+                            <>
+                                <div className="flex items-center space-x-2 text-white">
+                                    <span>Welcome, {user.name}!</span>
+                                </div>
+                                <Button
+                                    onClick={() => navigate('/my-hotels')}
+                                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                                >
+                                    My Hotels
                                 </Button>
-                            </Dialog.Trigger>
-                            <Dialog.Portal>
-                                <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-                                <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 w-[400px]">
-                                    <LoginForm onSignupClick={() => {
-                                        setIsLoginModalOpen(false)
-                                        setIsSignupModalOpen(true)
-                                    }} />
-                                </Dialog.Content>
-                            </Dialog.Portal>
-                        </Dialog.Root>
+                                <Button
+                                    onClick={() => navigate('/my-hotels')}
+                                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                                >
+                                    My Hotels
+                                </Button>
+                                <Button
+                                    onClick={() => navigate('/profile')}
+                                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+                                >
+                                    Profile
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        logout();
+                                        setShowSuccess(false);
+                                    }}
+                                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                                >
+                                    Logout
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex items-center space-x-2 text-white">
+                                    <Home className="w-4 h-4" />
+                                    <span>List Your Property</span>
+                                    <span className="text-gray-400">Grow your business</span>
+                                </div>
 
-                        <Dialog.Root open={isSignupModalOpen} onOpenChange={setIsSignupModalOpen}>
-                            <Dialog.Portal>
-                                <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-                                <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 w-[400px]">
-                                    <SignupForm onLoginClick={() => {
-                                        setIsSignupModalOpen(false)
-                                        setIsLoginModalOpen(true)
-                                    }} />
-                                </Dialog.Content>
-                            </Dialog.Portal>
-                        </Dialog.Root>
+                                <div className="flex items-center space-x-2 text-white">
+                                    <FileText className="w-4 h-4" />
+                                    <span>My Trips</span>
+                                    <span className="text-gray-400">Manage your bookings</span>
+                                </div>
+                            </>
+                        )}
+
+                        {!user && (
+                            <Dialog.Root open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen} modal={true}>
+                                <Dialog.Trigger asChild>
+                                    <Button className="bg-blue-500 text-white px-4 py-2 rounded flex items-center space-x-2">
+                                        <span>Login or Create Account</span>
+                                        <ChevronDown className="w-4 h-4" />
+                                    </Button>
+                                </Dialog.Trigger>
+                                <Dialog.Portal>
+                                    <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
+                                    <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl p-8 w-[450px] max-w-[90vw] max-h-[90vh] overflow-y-auto z-50 border border-gray-200">
+                                        <div className="absolute top-4 right-4">
+                                            <Dialog.Close asChild>
+                                                <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </Dialog.Close>
+                                        </div>
+                                        <LoginForm
+                                            onSignupClick={() => {
+                                                setIsLoginModalOpen(false)
+                                                setIsSignupModalOpen(true)
+                                            }}
+                                            onSuccess={() => handleAuthSuccess('Login successful! Welcome back!')}
+                                        />
+                                    </Dialog.Content>
+                                </Dialog.Portal>
+                            </Dialog.Root>
+                        )}
+
+                        {!user && (
+                            <Dialog.Root open={isSignupModalOpen} onOpenChange={setIsSignupModalOpen} modal={true}>
+                                <Dialog.Portal>
+                                    <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
+                                    <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl p-8 w-[450px] max-w-[90vw] max-h-[90vh] overflow-y-auto z-50 border border-gray-200">
+                                        <div className="absolute top-4 right-4">
+                                            <Dialog.Close asChild>
+                                                <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </Dialog.Close>
+                                        </div>
+                                        <SignupForm
+                                            onLoginClick={() => {
+                                                setIsSignupModalOpen(false)
+                                                setIsLoginModalOpen(true)
+                                            }}
+                                            onSuccess={() => handleAuthSuccess('Account created successfully! Welcome to HotelBooking!')}
+                                        />
+                                    </Dialog.Content>
+                                </Dialog.Portal>
+                            </Dialog.Root>
+                        )}
                     </div>
                 </div>
             </header>
@@ -93,8 +206,8 @@ export default function HomePage() {
                             <button
                                 onClick={() => setActiveTab('flights')}
                                 className={`flex items-center space-x-2 pb-3 ${activeTab === 'flights'
-                                        ? 'border-b-2 border-blue-500 text-blue-500'
-                                        : 'text-gray-600'
+                                    ? 'border-b-2 border-blue-500 text-blue-500'
+                                    : 'text-gray-600'
                                     }`}
                             >
                                 <Plane className="w-5 h-5" />
@@ -103,8 +216,8 @@ export default function HomePage() {
                             <button
                                 onClick={() => setActiveTab('hotels')}
                                 className={`flex items-center space-x-2 pb-3 ${activeTab === 'hotels'
-                                        ? 'border-b-2 border-blue-500 text-blue-500'
-                                        : 'text-gray-600'
+                                    ? 'border-b-2 border-blue-500 text-blue-500'
+                                    : 'text-gray-600'
                                     }`}
                             >
                                 <Building className="w-5 h-5" />
@@ -113,8 +226,8 @@ export default function HomePage() {
                             <button
                                 onClick={() => setActiveTab('cabs')}
                                 className={`flex items-center space-x-2 pb-3 ${activeTab === 'cabs'
-                                        ? 'border-b-2 border-blue-500 text-blue-500'
-                                        : 'text-gray-600'
+                                    ? 'border-b-2 border-blue-500 text-blue-500'
+                                    : 'text-gray-600'
                                     }`}
                             >
                                 <Car className="w-5 h-5" />
@@ -204,7 +317,7 @@ export default function HomePage() {
                         <div className="text-white">
                             <h2 className="text-4xl font-bold mb-4">Welcome to HotelBooking</h2>
                             <p className="text-xl text-gray-300 mb-8">Find your perfect stay with our extensive collection of hotels worldwide</p>
-                            
+
                             {/* Quick Stats */}
                             <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
                                 <div className="text-center">
@@ -250,6 +363,17 @@ export default function HomePage() {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Hotel Feed Section */}
+            <div className="bg-gray-50 py-16">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Discover Amazing Hotels</h2>
+                        <p className="text-xl text-gray-600">Find your perfect stay with our curated collection</p>
+                    </div>
+                    <HotelFeed />
                 </div>
             </div>
         </div>

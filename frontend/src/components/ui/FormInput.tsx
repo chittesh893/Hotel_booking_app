@@ -12,7 +12,7 @@ interface FormInputProps {
     autoComplete?: string;
     rows?: number;
     accept?: string;
-    children?: React.ReactNode;
+    [key: string]: any; // Allow any additional props
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -26,11 +26,11 @@ const FormInput: React.FC<FormInputProps> = ({
     autoComplete,
     rows,
     accept,
-    children
+    ...props
 }) => {
-    const baseInputClasses = "w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-colors duration-200";
+    const baseInputClasses = "w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-colors duration-200 bg-white text-gray-900 placeholder-gray-500";
     const errorClasses = error ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-indigo-400';
-    const inputClasses = `${baseInputClasses} ${errorClasses} ${className}`;
+    const inputClasses = `${baseInputClasses} ${errorClasses} ${className}`.trim();
 
     return (
         <div className="space-y-1">
@@ -46,10 +46,10 @@ const FormInput: React.FC<FormInputProps> = ({
                     id={name}
                     name={name}
                     placeholder={placeholder}
-                    className={inputClasses}
+                    className={`${inputClasses} bg-white text-gray-900 placeholder-gray-500`}
                     rows={rows || 4}
                     autoComplete={autoComplete}
-                    {...children}
+                    {...props}
                 />
             ) : type === 'file' ? (
                 <input
@@ -58,7 +58,7 @@ const FormInput: React.FC<FormInputProps> = ({
                     type={type}
                     accept={accept}
                     className={`block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 ${error ? 'border-red-500' : ''}`}
-                    {...children}
+                    {...props}
                 />
             ) : (
                 <input
@@ -68,7 +68,7 @@ const FormInput: React.FC<FormInputProps> = ({
                     placeholder={placeholder}
                     className={inputClasses}
                     autoComplete={autoComplete}
-                    {...children}
+                    {...props}
                 />
             )}
 

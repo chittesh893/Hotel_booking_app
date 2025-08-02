@@ -9,7 +9,8 @@
         "build": "tsc",
         "watch": "tsc -w",
         "test-connection": "ts-node src/test-connection.ts",
-        "seed:hotels": "ts-node src/scripts/seedHotels.ts"
+        "seed:hotels": "ts-node src/scripts/seedHotels.ts",
+        "add-test-hotels": "node src/scripts/addTestHotels.js"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",

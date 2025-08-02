@@ -5,10 +5,12 @@ import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
-import Dashboard from './components/Dashboard';
 import AddHotelForm from './components/AddHotelForm';
 import EditHotelForm from './components/EditHotelForm';
 import HotelFeed from './components/HotelFeed';
+import HotelDetails from './components/HotelDetails';
+import Profile from './components/Profile';
+import MyHotels from './components/MyHotels';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
 
@@ -65,14 +67,7 @@ const AppRoutes: React.FC = () => {
                 </PublicRoute>
               }
             />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+            
             <Route
               path="/hotels"
               element={
@@ -94,6 +89,26 @@ const AppRoutes: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <EditHotelForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hotels/:hotelId"
+              element={<HotelDetails />}
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-hotels"
+              element={
+                <ProtectedRoute>
+                  <MyHotels />
                 </ProtectedRoute>
               }
             />

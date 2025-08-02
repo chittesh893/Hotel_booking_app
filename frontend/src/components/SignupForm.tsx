@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useSignupForm, handleFormError } from '../lib/hooks/useFormValidation';
 import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
+import SuccessMessage from './ui/SuccessMessage';
+import { useNavigate } from 'react-router-dom';
 
 interface SignupFormProps {
     onLoginClick?: () => void;
+    onSuccess?: () => void;
 }
 
-const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
+const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
     const { register: registerUser } = useAuth();
+    const navigate = useNavigate();
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const {
         register,
@@ -21,8 +26,24 @@ const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
     const onSubmit = async (data: { name: string; email: string; password: string; phone: string }) => {
         try {
             await registerUser(data.name, data.email, data.password, data.phone);
+            // Show success message
+            setShowSuccess(true);
+            // Call onSuccess callback to close modal and show success on homepage
+            setTimeout(() => {
+                if (onSuccess) {
+                    onSuccess();
+                }
+            }, 2000);
         } catch (err: any) {
-            handleFormError(setError, err, 'Registration failed');
+            // Handle specific error for existing user
+            if (err.message.includes('already exists')) {
+                setError('email', {
+                    type: 'manual',
+                    message: 'An account with this email already exists. Please try logging in instead.'
+                });
+            } else {
+                handleFormError(setError, err, 'Registration failed');
+            }
         }
     };
 
@@ -89,6 +110,10 @@ const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
                         {...register('confirmPassword')}
                     />
                 </div>
+
+                {showSuccess && (
+                    <SuccessMessage message="Account created successfully! Redirecting to homepage..." />
+                )}
 
                 {errors.root && (
                     <div className="rounded-md bg-red-50 p-4">

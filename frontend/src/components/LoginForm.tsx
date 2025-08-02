@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLoginForm, handleFormError } from '../lib/hooks/useFormValidation';
 import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
+import SuccessMessage from './ui/SuccessMessage';
 
 interface LoginFormProps {
     onSignupClick?: () => void;
+    onSuccess?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick, onSuccess }) => {
     const { login } = useAuth();
     const navigate = useNavigate();
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const {
         register,
@@ -23,6 +26,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick }) => {
     const onSubmit = async (data: { email: string; password: string }) => {
         try {
             await login(data.email, data.password);
+            // Show success message
+            setShowSuccess(true);
+            // Call onSuccess callback to close modal and show success on homepage
+            setTimeout(() => {
+                if (onSuccess) {
+                    onSuccess();
+                }
+            }, 2000);
         } catch (err: any) {
             handleFormError(setError, err, 'Login failed');
         }
@@ -39,14 +50,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick }) => {
                 </p>
             </div>
             <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                <div className="rounded-md shadow-sm -space-y-px">
+                <div className="space-y-4">
                     <FormInput
                         name="email"
                         type="email"
                         placeholder="Email address"
                         error={errors.email}
                         autoComplete="email"
-                        className="appearance-none rounded-none rounded-t-md"
                         {...register('email')}
                     />
                     <FormInput
@@ -55,10 +65,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick }) => {
                         placeholder="Password"
                         error={errors.password}
                         autoComplete="current-password"
-                        className="appearance-none rounded-none rounded-b-md"
                         {...register('password')}
                     />
                 </div>
+
+                {showSuccess && (
+                    <SuccessMessage message="Login successful! Redirecting to homepage..." />
+                )}
 
                 {errors.root && (
                     <div className="rounded-md bg-red-50 p-4">

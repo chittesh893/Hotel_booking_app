@@ -64,28 +64,28 @@ export interface EditHotelFormData {
 export const useLoginForm = (): UseFormReturn<LoginFormData> => {
     return useForm<LoginFormData>({
         resolver: yupResolver(loginSchema),
-        mode: 'onChange'
+        mode: 'onBlur'
     });
 };
 
 export const useSignupForm = (): UseFormReturn<SignupFormData> => {
     return useForm<SignupFormData>({
         resolver: yupResolver(signupSchema),
-        mode: 'onChange'
+        mode: 'onBlur'
     });
 };
 
 export const useHotelForm = (): UseFormReturn<HotelFormData> => {
     return useForm<HotelFormData>({
         resolver: yupResolver(hotelSchema),
-        mode: 'onChange'
+        mode: 'onBlur'
     });
 };
 
 export const useEditHotelForm = (): UseFormReturn<EditHotelFormData> => {
     return useForm<EditHotelFormData>({
         resolver: yupResolver(editHotelSchema),
-        mode: 'onChange'
+        mode: 'onBlur'
     });
 };
 

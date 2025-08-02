@@ -7,10 +7,6 @@
     line-height: 1.5;
     font-weight: 400;
 
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
-
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -30,17 +26,14 @@ a:hover {
 
 body {
     margin: 0;
-    display: flex;
-    place-items: center;
     min-width: 320px;
     min-height: 100vh;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 #root {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
+    width: 100%;
+    min-height: 100vh;
 }
 
 .card {
@@ -49,4 +42,64 @@ body {
 
 .read-the-docs {
     color: #888;
+}
+
+/* Form input styles to ensure proper visibility */
+input,
+textarea,
+select {
+    color: #1f2937 !important;
+    /* text-gray-900 */
+    background-color: #ffffff !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #6b7280 !important;
+    /* text-gray-500 */
+}
+
+/* Ensure form labels are visible */
+label {
+    color: #374151 !important;
+    /* text-gray-700 */
+}
+
+/* Modal styles for better z-index handling */
+[data-radix-portal] {
+    z-index: 9999;
+}
+
+/* Ensure modals are always on top */
+[data-radix-dialog-overlay] {
+    z-index: 50 !important;
+    animation: fadeIn 0.2s ease-out;
+}
+
+[data-radix-dialog-content] {
+    z-index: 51 !important;
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }

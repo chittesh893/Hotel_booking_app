@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Star, MapPin, Users, Calendar } from 'lucide-react';
-import { Hotel, SAMPLE_HOTELS } from '../lib/constants';
+import { Hotel } from '../lib/constants';
 import { useAuth } from './AuthContext';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 interface HotelFeedProps {
     onHotelClick?: (hotel: Hotel) => void;
@@ -9,39 +11,86 @@ interface HotelFeedProps {
 
 const HotelFeed: React.FC<HotelFeedProps> = ({ onHotelClick }) => {
     const { user } = useAuth();
-    const [hotels, setHotels] = useState<Hotel[]>(SAMPLE_HOTELS);
-    const [filteredHotels, setFilteredHotels] = useState<Hotel[]>(SAMPLE_HOTELS);
+    const navigate = useNavigate();
+    const [hotels, setHotels] = useState<Hotel[]>([]);
+    const [filteredHotels, setFilteredHotels] = useState<Hotel[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch hotels from API
+    useEffect(() => {
+        const fetchHotels = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get('http://localhost:5000/api/hotels/search');
+                setHotels(response.data.data);
+                setFilteredHotels(response.data.data);
+            } catch (error) {
+                console.error('Error fetching hotels:', error);
+                // Fallback to sample data if API fails
+                const fallbackHotels = [
+                    {
+                        _id: '1',
+                        name: 'Grand Plaza Hotel',
+                        description: 'Luxurious 5-star hotel in the heart of the city',
+                        location: { city: 'Mumbai', state: 'Maharashtra' },
+                        images: ['https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'],
+                        amenities: ['WiFi', 'Pool', 'Restaurant'],
+                        rating: 4.5,
+                        pricePerNight: 8000
+                    },
+                    {
+                        _id: '2',
+                        name: 'Seaside Resort',
+                        description: 'Beautiful beachfront resort with stunning views',
+                        location: { city: 'Goa', state: 'Goa' },
+                        images: ['https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800'],
+                        amenities: ['WiFi', 'Pool', 'Beach Access'],
+                        rating: 4.8,
+                        pricePerNight: 12000
+                    }
+                ];
+                setHotels(fallbackHotels);
+                setFilteredHotels(fallbackHotels);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchHotels();
+    }, []);
 
     // Get unique cities from hotels
-    const cities = [...new Set(hotels.map(hotel => hotel.location.city))];
+    const cities = hotels ? [...new Set(hotels.map(hotel => hotel.location?.city).filter(Boolean))] : [];
 
     // Filter hotels based on search criteria
     useEffect(() => {
+        if (!hotels) return;
+
         let filtered = hotels.filter(hotel => {
-            const matchesSearch = hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                hotel.location.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                hotel.description.toLowerCase().includes(searchTerm.toLowerCase());
-            
-            const matchesCity = selectedCity === '' || hotel.location.city === selectedCity;
-            
+            const matchesSearch = hotel.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                hotel.location?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                hotel.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+            const matchesCity = selectedCity === '' || hotel.location?.city === selectedCity;
+
             const matchesPrice = hotel.pricePerNight >= priceRange[0] && hotel.pricePerNight <= priceRange[1];
-            
-            const matchesAmenities = selectedAmenities.length === 0 || 
-                                   selectedAmenities.some(amenity => hotel.amenities.includes(amenity));
-            
+
+            const matchesAmenities = selectedAmenities.length === 0 ||
+                selectedAmenities.some(amenity => hotel.amenities?.includes(amenity));
+
             return matchesSearch && matchesCity && matchesPrice && matchesAmenities;
         });
-        
+
         setFilteredHotels(filtered);
     }, [hotels, searchTerm, selectedCity, priceRange, selectedAmenities]);
 
     const handleAmenityToggle = (amenity: string) => {
-        setSelectedAmenities(prev => 
-            prev.includes(amenity) 
+        setSelectedAmenities(prev =>
+            prev.includes(amenity)
                 ? prev.filter(a => a !== amenity)
                 : [...prev, amenity]
         );
@@ -168,7 +217,12 @@ const HotelFeed: React.FC<HotelFeedProps> = ({ onHotelClick }) => {
 
                     {/* Hotels Grid */}
                     <div className="lg:col-span-3">
-                        {filteredHotels.length === 0 ? (
+                        {loading ? (
+                            <div className="text-center py-12">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                                <p className="text-gray-600">Loading hotels...</p>
+                            </div>
+                        ) : filteredHotels.length === 0 ? (
                             <div className="text-center py-12">
                                 <div className="text-gray-400 mb-4">
                                     <Search className="w-16 h-16 mx-auto" />
@@ -182,45 +236,45 @@ const HotelFeed: React.FC<HotelFeedProps> = ({ onHotelClick }) => {
                                     <div
                                         key={hotel._id || index}
                                         className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                                        onClick={() => onHotelClick?.(hotel)}
+                                        onClick={() => navigate(`/hotels/${hotel._id}`)}
                                     >
                                         {/* Hotel Image */}
                                         <div className="relative h-48">
                                             <img
-                                                src={hotel.images[0]}
-                                                alt={hotel.name}
+                                                src={hotel.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'}
+                                                alt={hotel.name || 'Hotel'}
                                                 className="w-full h-full object-cover"
                                             />
                                             <div className="absolute top-3 right-3 bg-white rounded-full px-2 py-1 flex items-center">
                                                 <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                                                <span className="ml-1 text-sm font-medium">{hotel.rating}</span>
+                                                <span className="ml-1 text-sm font-medium">{hotel.rating || 0}</span>
                                             </div>
                                         </div>
 
                                         {/* Hotel Info */}
                                         <div className="p-4">
                                             <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
-                                                {hotel.name}
+                                                {hotel.name || 'Hotel Name'}
                                             </h3>
                                             <div className="flex items-center text-gray-500 mb-2">
                                                 <MapPin className="w-4 h-4 mr-1" />
-                                                <span className="text-sm">{hotel.location.city}, {hotel.location.state}</span>
+                                                <span className="text-sm">{hotel.location?.city || 'City'}, {hotel.location?.state || 'State'}</span>
                                             </div>
                                             <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                                                {hotel.description}
+                                                {hotel.description || 'No description available'}
                                             </p>
-                                            
+
                                             {/* Amenities */}
                                             <div className="flex flex-wrap gap-1 mb-3">
-                                                {hotel.amenities.slice(0, 3).map(amenity => (
+                                                {hotel.amenities?.slice(0, 3).map(amenity => (
                                                     <span
                                                         key={amenity}
                                                         className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded"
                                                     >
                                                         {amenity}
                                                     </span>
-                                                ))}
-                                                {hotel.amenities.length > 3 && (
+                                                )) || []}
+                                                {hotel.amenities?.length > 3 && (
                                                     <span className="text-gray-500 text-xs">+{hotel.amenities.length - 3} more</span>
                                                 )}
                                             </div>
@@ -229,11 +283,17 @@ const HotelFeed: React.FC<HotelFeedProps> = ({ onHotelClick }) => {
                                             <div className="flex items-center justify-between">
                                                 <div>
                                                     <span className="text-2xl font-bold text-gray-900">
-                                                        ₹{hotel.pricePerNight.toLocaleString()}
+                                                        ₹{(hotel.pricePerNight || 0).toLocaleString()}
                                                     </span>
                                                     <span className="text-gray-500 text-sm">/night</span>
                                                 </div>
-                                                <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                                <button
+                                                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/hotels/${hotel._id}`);
+                                                    }}
+                                                >
                                                     View Details
                                                 </button>
                                             </div>
