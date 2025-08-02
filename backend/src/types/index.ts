@@ -20,26 +20,45 @@ export interface AuthRequest extends Request {
 
 // Hotel types
 export interface IHotel extends Document {
-    userId?: Types.ObjectId;
+    ownerId?: Types.ObjectId;
     name: string;
     description: string;
-    address: {
-        street: string;
+    location: {
         city: string;
         state: string;
-        zipCode: string;
         country: string;
+        address: string;
+        coordinates?: {
+            latitude: number;
+            longitude: number;
+        };
     };
-    amenities: string[];
     images: string[];
+    amenities: string[];
     rating: number;
-    priceRange: {
-        min: number;
-        max: number;
+    pricePerNight: number;
+    currency: string;
+    roomTypes: {
+        name: string;
+        description: string;
+        price: number;
+        capacity: number;
+        available: number;
+    }[];
+    contact: {
+        phone: string;
+        email: string;
+        website?: string;
+    };
+    policies: {
+        checkIn: string;
+        checkOut: string;
+        cancellation: string;
+        pets: boolean;
+        smoking: boolean;
     };
     createdAt: Date;
     updatedAt: Date;
-    
 }
 
 // Room types

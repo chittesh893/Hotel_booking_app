@@ -9,9 +9,12 @@ const router = express.Router();
 // Create a new hotel
 router.post('/', auth, [
     body('name').notEmpty().withMessage('Hotel name is required'),
-    body('location').notEmpty().withMessage('Location is required'),
-    body('details').notEmpty().withMessage('Hotel details are required'),
-    body('photo').notEmpty().withMessage('Hotel photo is required')
+    body('description').notEmpty().withMessage('Hotel description is required'),
+    body('location').isObject().withMessage('Location object is required'),
+    body('images').isArray().withMessage('Images array is required'),
+    body('pricePerNight').isNumeric().withMessage('Price per night is required'),
+    body('contact.phone').notEmpty().withMessage('Phone number is required'),
+    body('contact.email').isEmail().withMessage('Valid email is required')
 ], async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         // Check for validation errors
@@ -25,40 +28,40 @@ router.post('/', auth, [
             return;
         }
 
-        const { name, location, details, photo } = req.body;
-
-        // Parse location into address components
-        const addressParts = location.split(',').map((part: string) => part.trim());
-
-        // Ensure we have at least basic location info
-        if (addressParts.length < 2) {
-            res.status(400).json({
-                success: false,
-                message: 'Please provide location in format: Street, City, State, ZipCode, Country'
-            });
-            return;
-        }
-
-        const address = {
-            street: addressParts[0] || 'Unknown Street',
-            city: addressParts[1] || 'Unknown City',
-            state: addressParts[2] || 'Unknown State',
-            zipCode: addressParts[3] || '00000',
-            country: addressParts[4] || 'Unknown'
-        };
-
-        // Create new hotel with userId
-        const hotel = new Hotel({
-            userId: req.user!._id,
+        const {
             name,
-            description: details, // Use details as description
-            address,
-            amenities: [], // Can be enhanced later
-            images: [photo], // Store the photo URL
-            priceRange: {
-                min: 0, // Default values, can be enhanced later
-                max: 0
+            description,
+            location,
+            images,
+            amenities = [],
+            rating = 4.0,
+            pricePerNight,
+            currency = 'INR',
+            roomTypes = [],
+            contact,
+            policies = {
+                checkIn: '2:00 PM',
+                checkOut: '11:00 AM',
+                cancellation: 'Free cancellation up to 24 hours before check-in',
+                pets: false,
+                smoking: false
             }
+        } = req.body;
+
+        // Create new hotel with ownerId
+        const hotel = new Hotel({
+            ownerId: req.user!._id,
+            name,
+            description,
+            location,
+            images: images.filter((img: string) => img.trim() !== ''),
+            amenities,
+            rating,
+            pricePerNight,
+            currency,
+            roomTypes,
+            contact,
+            policies
         });
 
         await hotel.save();
@@ -109,13 +112,13 @@ router.get('/search', async (req: Request, res: Response): Promise<void> => {
 
         // Location filters
         if (city) {
-            searchQuery['address.city'] = { $regex: city as string, $options: 'i' };
+            searchQuery['location.city'] = { $regex: city as string, $options: 'i' };
         }
         if (state) {
-            searchQuery['address.state'] = { $regex: state as string, $options: 'i' };
+            searchQuery['location.state'] = { $regex: state as string, $options: 'i' };
         }
         if (country) {
-            searchQuery['address.country'] = { $regex: country as string, $options: 'i' };
+            searchQuery['location.country'] = { $regex: country as string, $options: 'i' };
         }
 
         // Rating filter
@@ -125,7 +128,7 @@ router.get('/search', async (req: Request, res: Response): Promise<void> => {
 
         // Price filter
         if (maxPrice) {
-            searchQuery['priceRange.max'] = { $lte: parseFloat(maxPrice as string) };
+            searchQuery.pricePerNight = { $lte: parseFloat(maxPrice as string) };
         }
 
         // Amenities filter
@@ -143,7 +146,7 @@ router.get('/search', async (req: Request, res: Response): Promise<void> => {
 
         // Execute query with pagination
         const hotels = await Hotel.find(searchQuery)
-            .populate('userId', 'name email')
+            .populate('ownerId', 'name email')
             .sort(sortObject)
             .skip(skip)
             .limit(parseInt(limit as string));
@@ -177,7 +180,7 @@ router.get('/search', async (req: Request, res: Response): Promise<void> => {
 // Get all hotels
 router.get('/', async (req: Request, res: Response): Promise<void> => {
     try {
-        const hotels = await Hotel.find().populate('userId', 'name email').sort({ createdAt: -1 });
+        const hotels = await Hotel.find().populate('ownerId', 'name email').sort({ createdAt: -1 });
 
         res.json({
             success: true,
@@ -198,7 +201,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
 // Get hotel by ID
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     try {
-        const hotel = await Hotel.findById(req.params.id).populate('userId', 'name email');
+        const hotel = await Hotel.findById(req.params.id).populate('ownerId', 'name email');
 
         if (!hotel) {
             res.status(404).json({
@@ -227,9 +230,12 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
 // Update hotel (only by owner)
 router.put('/:id', auth, [
     body('name').notEmpty().withMessage('Hotel name is required'),
-    body('location').notEmpty().withMessage('Location is required'),
-    body('details').notEmpty().withMessage('Hotel details are required'),
-    body('photo').notEmpty().withMessage('Hotel photo is required')
+    body('description').notEmpty().withMessage('Hotel description is required'),
+    body('location').isObject().withMessage('Location object is required'),
+    body('images').isArray().withMessage('Images array is required'),
+    body('pricePerNight').isNumeric().withMessage('Price per night is required'),
+    body('contact.phone').notEmpty().withMessage('Phone number is required'),
+    body('contact.email').isEmail().withMessage('Valid email is required')
 ], async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         // Check for validation errors
@@ -243,7 +249,26 @@ router.put('/:id', auth, [
             return;
         }
 
-        const { name, location, details, photo } = req.body;
+        const {
+            name,
+            description,
+            location,
+            images,
+            amenities = [],
+            rating = 4.0,
+            pricePerNight,
+            currency = 'INR',
+            roomTypes = [],
+            contact,
+            policies = {
+                checkIn: '2:00 PM',
+                checkOut: '11:00 AM',
+                cancellation: 'Free cancellation up to 24 hours before check-in',
+                pets: false,
+                smoking: false
+            }
+        } = req.body;
+
         const hotelId = req.params.id;
 
         // Find hotel and check ownership
@@ -257,7 +282,7 @@ router.put('/:id', auth, [
         }
 
         // Check if user owns the hotel
-        if (!hotel.userId) {
+        if (!hotel.ownerId) {
             res.status(403).json({
                 success: false,
                 message: 'This hotel was created before user ownership was implemented'
@@ -265,7 +290,7 @@ router.put('/:id', auth, [
             return;
         }
 
-        if (hotel.userId.toString() !== req.user!._id.toString()) {
+        if (hotel.ownerId.toString() !== req.user!._id.toString()) {
             res.status(403).json({
                 success: false,
                 message: 'You can only edit hotels you created'
@@ -273,37 +298,24 @@ router.put('/:id', auth, [
             return;
         }
 
-        // Parse location into address components
-        const addressParts = location.split(',').map((part: string) => part.trim());
-
-        // Ensure we have at least basic location info
-        if (addressParts.length < 2) {
-            res.status(400).json({
-                success: false,
-                message: 'Please provide location in format: Street, City, State, ZipCode, Country'
-            });
-            return;
-        }
-
-        const address = {
-            street: addressParts[0] || 'Unknown Street',
-            city: addressParts[1] || 'Unknown City',
-            state: addressParts[2] || 'Unknown State',
-            zipCode: addressParts[3] || '00000',
-            country: addressParts[4] || 'Unknown'
-        };
-
         // Update hotel
         const updatedHotel = await Hotel.findByIdAndUpdate(
             hotelId,
             {
                 name,
-                description: details,
-                address,
-                images: [photo]
+                description,
+                location,
+                images: images.filter((img: string) => img.trim() !== ''),
+                amenities,
+                rating,
+                pricePerNight,
+                currency,
+                roomTypes,
+                contact,
+                policies
             },
             { new: true }
-        ).populate('userId', 'name email');
+        ).populate('ownerId', 'name email');
 
         res.json({
             success: true,
@@ -337,7 +349,7 @@ router.delete('/:id', auth, async (req: AuthRequest, res: Response): Promise<voi
         }
 
         // Check if user owns the hotel
-        if (!hotel.userId) {
+        if (!hotel.ownerId) {
             res.status(403).json({
                 success: false,
                 message: 'This hotel was created before user ownership was implemented'
@@ -345,7 +357,7 @@ router.delete('/:id', auth, async (req: AuthRequest, res: Response): Promise<voi
             return;
         }
 
-        if (hotel.userId.toString() !== req.user!._id.toString()) {
+        if (hotel.ownerId.toString() !== req.user!._id.toString()) {
             res.status(403).json({
                 success: false,
                 message: 'You can only delete hotels you created'

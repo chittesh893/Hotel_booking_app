@@ -5,10 +5,11 @@
     "main": "dist/server.js",
     "scripts": {
         "start": "node dist/server.js",
-        "dev": "nodemon src/server.ts",
+        "dev": "nodemon src/index.ts",
         "build": "tsc",
         "watch": "tsc -w",
-        "test-connection": "ts-node src/test-connection.ts"
+        "test-connection": "ts-node src/test-connection.ts",
+        "seed:hotels": "ts-node src/scripts/seedHotels.ts"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",

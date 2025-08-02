@@ -199,90 +199,54 @@ export default function HomePage() {
                         )}
                     </div>
 
-                    {/* Luxury Sections */}
-                    <div className="mb-16">
-                        <div className="grid grid-cols-4 gap-8">
-                            {/* Intro Section */}
-                            <div className="text-white">
-                                <h2 className="text-sm text-gray-300 mb-2">INTRODUCING</h2>
-                                <h3 className="text-4xl font-bold text-yellow-400 mb-2">Luxe</h3>
-                                <h3 className="text-4xl font-bold text-yellow-400">Selections</h3>
-                            </div>
-
-                            {/* Luxe Properties in India */}
-                            <div className="group relative rounded-lg overflow-hidden cursor-pointer">
-                                <img
-                                    src="https://promos.makemytrip.com/Hotels_product/Luxe/brands.png"
-                                    alt="Luxury Palace"
-                                    className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                                <div className="absolute bottom-4 left-4 text-white">
-                                    <h4 className="text-xl font-bold mb-1">Luxe properties in India</h4>
-                                    <p className="text-sm">Explore by Luxury brands, themes & top picks</p>
+                    {/* Welcome Section */}
+                    <div className="mb-16 text-center">
+                        <div className="text-white">
+                            <h2 className="text-4xl font-bold mb-4">Welcome to HotelBooking</h2>
+                            <p className="text-xl text-gray-300 mb-8">Find your perfect stay with our extensive collection of hotels worldwide</p>
+                            
+                            {/* Quick Stats */}
+                            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+                                <div className="text-center">
+                                    <div className="text-3xl font-bold text-yellow-400 mb-2">1000+</div>
+                                    <div className="text-gray-300">Hotels Worldwide</div>
                                 </div>
-                            </div>
-
-                            {/* Luxe Villas */}
-                            <div className="group relative rounded-lg overflow-hidden cursor-pointer">
-                                <img
-                                    src="https://promos.makemytrip.com/altacco_luxe/imgs/luxe_villa.jpg"
-                                    alt="Luxury Villa"
-                                    className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                                <div className="absolute bottom-4 left-4 text-white">
-                                    <h4 className="text-xl font-bold mb-1">Luxe Villas</h4>
-                                    <p className="text-sm">Premium Villas with Superlative Experience</p>
+                                <div className="text-center">
+                                    <div className="text-3xl font-bold text-yellow-400 mb-2">50+</div>
+                                    <div className="text-gray-300">Countries</div>
                                 </div>
-                            </div>
-
-                            {/* Luxe International */}
-                            <div className="group relative rounded-lg overflow-hidden cursor-pointer">
-                                <img
-                                    src="https://promos.makemytrip.com/notification/xhdpi/maldives.jpg"
-                                    alt="International Luxury Resort"
-                                    className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                                <div className="absolute bottom-4 left-4 text-white">
-                                    <h4 className="text-xl font-bold mb-1">Luxe International</h4>
-                                    <p className="text-sm">Dubai, Maldives, Thailand & More</p>
+                                <div className="text-center">
+                                    <div className="text-3xl font-bold text-yellow-400 mb-2">24/7</div>
+                                    <div className="text-gray-300">Customer Support</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Flagship Hotel Stores */}
+                    {/* Features Section */}
                     <div className="mb-16">
-                        <h2 className="text-2xl font-bold text-white mb-8">Flagship Hotel Stores on HotelBooking</h2>
-                        <div className="grid grid-cols-2 gap-8">
-                            {/* Timbertales */}
-                            <div className="group relative rounded-lg overflow-hidden cursor-pointer">
-                                <img
-                                    src="https://platforms.makemytrip.com/contents/f8efe442-684a-4331-86d9-edc1a165d0c6"
-                                    alt="Timbertales Luxury Resort"
-                                    className="w-full h-80 object-cover transition-transform group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                                <div className="absolute bottom-4 left-4 text-white">
-                                    <h4 className="text-2xl font-bold mb-1">Timbertales Luxury Resort</h4>
-                                    <p className="text-sm">Experience luxury in the heart of nature</p>
+                        <h2 className="text-2xl font-bold text-white mb-8 text-center">Why Choose HotelBooking?</h2>
+                        <div className="grid grid-cols-3 gap-8">
+                            <div className="text-center text-white">
+                                <div className="bg-blue-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                    <Building className="w-8 h-8" />
                                 </div>
+                                <h3 className="text-xl font-bold mb-2">Best Prices</h3>
+                                <p className="text-gray-300">Get the best deals and discounts on hotel bookings</p>
                             </div>
-
-                            {/* Best Western */}
-                            <div className="group relative rounded-lg overflow-hidden cursor-pointer">
-                                <img
-                                    src="https://platforms.makemytrip.com/contents/227f8737-13e4-4e43-95ad-872b488a55cd"
-                                    alt="Best Western Hotels"
-                                    className="w-full h-80 object-cover transition-transform group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                                <div className="absolute bottom-4 left-4 text-white">
-                                    <h4 className="text-2xl font-bold mb-1">Best Western Hotels & Resorts</h4>
-                                    <p className="text-sm">Discover comfort and luxury worldwide</p>
+                            <div className="text-center text-white">
+                                <div className="bg-green-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                    <Calendar className="w-8 h-8" />
                                 </div>
+                                <h3 className="text-xl font-bold mb-2">Easy Booking</h3>
+                                <p className="text-gray-300">Simple and secure booking process with instant confirmation</p>
+                            </div>
+                            <div className="text-center text-white">
+                                <div className="bg-purple-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                    <Users className="w-8 h-8" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">24/7 Support</h3>
+                                <p className="text-gray-300">Round the clock customer support for all your needs</p>
                             </div>
                         </div>
                     </div>
