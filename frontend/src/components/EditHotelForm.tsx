@@ -3,8 +3,9 @@ import { useAuth } from './AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Upload, X } from 'lucide-react';
 import axios from 'axios';
+import { useToast } from './ToastContext';
 
 interface Hotel {
     _id: string;
@@ -40,9 +41,11 @@ const EditHotelForm: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { hotelId } = useParams<{ hotelId: string }>();
+    const toast = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
     const [hotel, setHotel] = useState<Hotel | null>(null);
+    const [uploadingImages, setUploadingImages] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -50,7 +53,7 @@ const EditHotelForm: React.FC = () => {
         city: '',
         state: '',
         address: '',
-        images: ['https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'],
+        images: [] as string[],
         amenities: [] as string[],
         rating: 4.0,
         pricePerNight: 5000,
@@ -92,6 +95,47 @@ const EditHotelForm: React.FC = () => {
             amenities: prev.amenities.includes(amenity)
                 ? prev.amenities.filter(a => a !== amenity)
                 : [...prev.amenities, amenity]
+        }));
+    };
+
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+
+        setUploadingImages(true);
+        try {
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('images', files[i]);
+            }
+
+            const response = await axios.post('http://localhost:5000/api/upload/multiple', formData, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            if (response.data.success) {
+                const newImageUrls = response.data.data.files.map((file: any) => file.url);
+                setFormData(prev => ({
+                    ...prev,
+                    images: [...prev.images, ...newImageUrls]
+                }));
+                toast.showSuccess(`${response.data.data.count} image(s) uploaded successfully!`);
+            }
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.error || 'Failed to upload images';
+            toast.showError(errorMessage);
+        } finally {
+            setUploadingImages(false);
+        }
+    };
+
+    const removeImage = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index)
         }));
     };
 
@@ -138,7 +182,7 @@ const EditHotelForm: React.FC = () => {
             }
         } catch (error: any) {
             console.error('Error fetching hotel:', error);
-            alert('Failed to fetch hotel data');
+            toast.showError('Failed to fetch hotel data');
         } finally {
             setLoading(false);
         }
@@ -148,7 +192,12 @@ const EditHotelForm: React.FC = () => {
         e.preventDefault();
 
         if (!user || !hotelId) {
-            alert('Please log in to edit a hotel');
+            toast.showError('Please log in to edit a hotel');
+            return;
+        }
+
+        if (formData.images.length === 0) {
+            toast.showError('At least one hotel image is required');
             return;
         }
 
@@ -180,12 +229,13 @@ const EditHotelForm: React.FC = () => {
             });
 
             if (response.data.success) {
-                alert('Hotel updated successfully!');
+                toast.showSuccess('Hotel updated successfully!');
                 navigate('/my-hotels');
             }
         } catch (error: any) {
             console.error('Error updating hotel:', error);
-            alert(error.response?.data?.message || 'Failed to update hotel');
+            const errorMessage = error.response?.data?.message || 'Failed to update hotel';
+            toast.showError(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -330,6 +380,61 @@ const EditHotelForm: React.FC = () => {
                                     placeholder="info@hotel.com"
                                     required
                                 />
+                            </div>
+                        </div>
+
+                        {/* Hotel Images */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Hotel Images</h3>
+                            <div className="space-y-4">
+                                {/* Image Upload */}
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        className="hidden"
+                                        id="image-upload"
+                                        disabled={uploadingImages}
+                                    />
+                                    <label
+                                        htmlFor="image-upload"
+                                        className="cursor-pointer flex flex-col items-center space-y-2"
+                                    >
+                                        <Upload className="w-8 h-8 text-gray-400" />
+                                        <div>
+                                            <p className="text-sm text-gray-600">
+                                                {uploadingImages ? 'Uploading...' : 'Click to upload images'}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                PNG, JPG, GIF, WEBP up to 5MB each
+                                            </p>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                {/* Display Uploaded Images */}
+                                {formData.images.length > 0 && (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        {formData.images.map((imageUrl, index) => (
+                                            <div key={index} className="relative group">
+                                                <img
+                                                    src={imageUrl}
+                                                    alt={`Hotel image ${index + 1}`}
+                                                    className="w-full h-32 object-cover rounded-lg"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(index)}
+                                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

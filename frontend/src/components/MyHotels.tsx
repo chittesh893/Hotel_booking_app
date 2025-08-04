@@ -14,6 +14,7 @@ import {
     // Calendar
 } from 'lucide-react';
 import axios from 'axios';
+import { useToast } from './ToastContext';
 
 interface MyHotel {
     _id: string;
@@ -56,6 +57,7 @@ interface MyHotel {
 const MyHotels: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const toast = useToast();
     const [hotels, setHotels] = useState<MyHotel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -75,7 +77,9 @@ const MyHotels: React.FC = () => {
             });
             setHotels(response.data.data.hotels);
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Failed to load your hotels');
+            const errorMessage = err.response?.data?.error || 'Failed to load your hotels';
+            setError(errorMessage);
+            toast.showError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -90,8 +94,10 @@ const MyHotels: React.FC = () => {
             });
             setHotels(hotels.filter(hotel => hotel._id !== hotelId));
             setDeleteConfirm(null);
+            toast.showSuccess('Hotel deleted successfully!');
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Failed to delete hotel');
+            const errorMessage = err.response?.data?.error || 'Failed to delete hotel';
+            toast.showError(errorMessage);
         }
     };
 

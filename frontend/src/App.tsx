@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './components/AuthContext';
+import { ToastProvider } from './components/ToastContext';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoginForm from './components/LoginForm';
@@ -67,7 +68,7 @@ const AppRoutes: React.FC = () => {
                 </PublicRoute>
               }
             />
-            
+
             <Route
               path="/hotels"
               element={
@@ -123,9 +124,11 @@ const AppRoutes: React.FC = () => {
 const App: React.FC = () => {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ToastProvider>
     </ErrorBoundary>
   );
 };

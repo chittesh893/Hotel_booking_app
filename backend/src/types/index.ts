@@ -1,6 +1,16 @@
 import { Request } from 'express';
 import { Document, Types } from 'mongoose';
 
+// Extend Request to include file properties for multer
+declare global {
+    namespace Express {
+        interface Request {
+            file?: Express.Multer.File;
+            files?: Express.Multer.File[];
+        }
+    }
+}
+
 // User types
 export interface IUser extends Document {
     name: string;
