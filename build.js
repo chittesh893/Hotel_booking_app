@@ -26,17 +26,48 @@ try {
 
     console.log('✅ Frontend build verified');
 
-    // Step 4: Build backend
+    // Step 4: Build backend (without copying frontend)
     console.log('🔧 Building backend...');
-    execSync('npm run build:backend', { stdio: 'inherit' });
+    execSync('cd backend && npm install && tsc', { stdio: 'inherit' });
 
-    // Step 5: Verify backend build
+    // Step 5: Copy frontend files manually
+    console.log('📁 Copying frontend files to backend...');
     const backendDistPath = path.join(__dirname, 'backend', 'dist');
+    const frontendInBackendPath = path.join(backendDistPath, 'frontend', 'dist');
+
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(path.dirname(frontendInBackendPath))) {
+        fs.mkdirSync(path.dirname(frontendInBackendPath), { recursive: true });
+    }
+
+    // Copy files using Node.js fs
+    function copyDir(src, dest) {
+        if (!fs.existsSync(dest)) {
+            fs.mkdirSync(dest, { recursive: true });
+        }
+        
+        const entries = fs.readdirSync(src, { withFileTypes: true });
+        
+        for (const entry of entries) {
+            const srcPath = path.join(src, entry.name);
+            const destPath = path.join(dest, entry.name);
+            
+            if (entry.isDirectory()) {
+                copyDir(srcPath, destPath);
+            } else {
+                fs.copyFileSync(srcPath, destPath);
+            }
+        }
+    }
+
+    copyDir(frontendDistPath, frontendInBackendPath);
+    console.log('✅ Frontend files copied successfully');
+
+    // Step 6: Verify backend build
     if (!fs.existsSync(backendDistPath)) {
         throw new Error('Backend dist folder not found!');
     }
 
-    const frontendInBackendPath = path.join(backendDistPath, 'frontend', 'dist');
     if (!fs.existsSync(frontendInBackendPath)) {
         throw new Error('Frontend files not copied to backend!');
     }
