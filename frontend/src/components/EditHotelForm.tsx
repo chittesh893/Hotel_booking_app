@@ -5,6 +5,7 @@ import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
 import { ArrowLeft } from 'lucide-react';
 import axios from 'axios';
+import { useToast } from './ToastContext';
 
 interface Hotel {
     _id: string;
@@ -40,6 +41,7 @@ const EditHotelForm: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { hotelId } = useParams<{ hotelId: string }>();
+    const toast = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
     const [hotel, setHotel] = useState<Hotel | null>(null);
@@ -138,7 +140,7 @@ const EditHotelForm: React.FC = () => {
             }
         } catch (error: any) {
             console.error('Error fetching hotel:', error);
-            alert('Failed to fetch hotel data');
+            toast.showError('Failed to fetch hotel data');
         } finally {
             setLoading(false);
         }
@@ -148,7 +150,7 @@ const EditHotelForm: React.FC = () => {
         e.preventDefault();
 
         if (!user || !hotelId) {
-            alert('Please log in to edit a hotel');
+            toast.showError('Please log in to edit a hotel');
             return;
         }
 
@@ -180,12 +182,13 @@ const EditHotelForm: React.FC = () => {
             });
 
             if (response.data.success) {
-                alert('Hotel updated successfully!');
+                toast.showSuccess('Hotel updated successfully!');
                 navigate('/my-hotels');
             }
         } catch (error: any) {
             console.error('Error updating hotel:', error);
-            alert(error.response?.data?.message || 'Failed to update hotel');
+            const errorMessage = error.response?.data?.message || 'Failed to update hotel';
+            toast.showError(errorMessage);
         } finally {
             setIsSubmitting(false);
         }

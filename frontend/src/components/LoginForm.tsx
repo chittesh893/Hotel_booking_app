@@ -5,6 +5,7 @@ import { useLoginForm, handleFormError } from '../lib/hooks/useFormValidation';
 import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
 import SuccessMessage from './ui/SuccessMessage';
+import { useToast } from './ToastContext';
 
 interface LoginFormProps {
     onSignupClick?: () => void;
@@ -13,6 +14,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick, onSuccess }) => {
     const { login } = useAuth();
+    const toast = useToast();
     // const navigate = useNavigate();
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -28,6 +30,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick, onSuccess }) => {
             await login(data.email, data.password);
             // Show success message
             setShowSuccess(true);
+            toast.showSuccess('Successfully logged in!');
             // Call onSuccess callback to close modal and show success on homepage
             setTimeout(() => {
                 if (onSuccess) {

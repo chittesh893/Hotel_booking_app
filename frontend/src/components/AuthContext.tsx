@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
+import { useToast } from './ToastContext';
 
 interface User {
     id: string;
@@ -38,6 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
+    const toast = useToast();
 
     // Configure axios defaults
     axios.defaults.baseURL = 'http://localhost:5000/api';
@@ -78,9 +80,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(user);
             setToken(newToken);
             localStorage.setItem('token', newToken);
+            toast.showSuccess('Successfully logged in!');
         } catch (error: any) {
             // Pass through the specific error message from backend
             const errorMessage = error.response?.data?.error || 'Login failed';
+            toast.showError(errorMessage);
             throw new Error(errorMessage);
         }
     };
@@ -98,9 +102,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(user);
             setToken(newToken);
             localStorage.setItem('token', newToken);
+            toast.showSuccess('Account created successfully!');
         } catch (error: any) {
             // Pass through the specific error message from backend
             const errorMessage = error.response?.data?.error || 'Registration failed';
+            toast.showError(errorMessage);
             throw new Error(errorMessage);
         }
     };
@@ -110,6 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(null);
         localStorage.removeItem('token');
         delete axios.defaults.headers.common['Authorization'];
+        toast.showInfo('Successfully logged out!');
     };
 
     const value = {

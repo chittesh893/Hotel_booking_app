@@ -5,6 +5,7 @@ import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
 import { Plus, X, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
+import { useToast } from './ToastContext';
 
 interface AddHotelFormProps {
     onSuccess?: () => void;
@@ -14,6 +15,7 @@ interface AddHotelFormProps {
 const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const toast = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -70,7 +72,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
         e.preventDefault();
 
         if (!user) {
-            alert('Please log in to add a hotel');
+            toast.showError('Please log in to add a hotel');
             return;
         }
 
@@ -79,11 +81,11 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
         try {
             // Validate required fields
             if (!formData.contact.phone.trim()) {
-                alert('Phone number is required');
+                toast.showError('Phone number is required');
                 return;
             }
             if (!formData.contact.email.trim()) {
-                alert('Email is required');
+                toast.showError('Email is required');
                 return;
             }
 
@@ -119,7 +121,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
             });
 
             if (response.data.success) {
-                alert('Hotel added successfully!');
+                toast.showSuccess('Hotel added successfully!');
                 if (onSuccess) {
                     onSuccess();
                 } else {
@@ -128,7 +130,8 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
             }
         } catch (error: any) {
             console.error('Error adding hotel:', error);
-            alert(error.response?.data?.message || 'Failed to add hotel');
+            const errorMessage = error.response?.data?.message || 'Failed to add hotel';
+            toast.showError(errorMessage);
         } finally {
             setIsSubmitting(false);
         }

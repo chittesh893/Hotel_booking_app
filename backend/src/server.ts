@@ -26,6 +26,7 @@ app.use(express.json());
 // Connect to database
 connectDB();
 
+
 // Serve static files from the React app build directory
 const frontendPath = path.join(__dirname, 'frontend/dist');
 app.use(express.static(frontendPath));

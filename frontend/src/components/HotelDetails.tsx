@@ -20,6 +20,8 @@ import {
     XCircle
 } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from './AuthContext';
+import { useToast } from './ToastContext';
 
 interface HotelDetails {
     _id: string;
@@ -67,6 +69,8 @@ interface HotelDetails {
 const HotelDetails: React.FC = () => {
     const { hotelId } = useParams<{ hotelId: string }>();
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const toast = useToast();
     const [hotel, setHotel] = useState<HotelDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -79,7 +83,9 @@ const HotelDetails: React.FC = () => {
                 const response = await axios.get(`http://localhost:5000/api/hotels/${hotelId}`);
                 setHotel(response.data.data.hotel);
             } catch (err: any) {
-                setError(err.response?.data?.error || 'Failed to load hotel details');
+                const errorMessage = err.response?.data?.error || 'Failed to load hotel details';
+                setError(errorMessage);
+                toast.showError(errorMessage);
             } finally {
                 setLoading(false);
             }
@@ -88,7 +94,7 @@ const HotelDetails: React.FC = () => {
         if (hotelId) {
             fetchHotelDetails();
         }
-    }, [hotelId]);
+    }, [hotelId, toast]);
 
     const getAmenityIcon = (amenity: string) => {
         const amenityIcons: { [key: string]: React.ReactNode } = {
@@ -100,6 +106,17 @@ const HotelDetails: React.FC = () => {
             'Coffee Shop': <Coffee className="w-5 h-5" />,
         };
         return amenityIcons[amenity] || <CheckCircle className="w-5 h-5" />;
+    };
+
+    const handleBookNow = (roomType: any) => {
+        if (!user) {
+            toast.showWarning('Please sign in to book a room');
+            navigate('/login');
+            return;
+        }
+
+        // Here you would implement the actual booking logic
+        toast.showInfo('Booking feature coming soon!');
     };
 
     if (loading) {
@@ -230,7 +247,10 @@ const HotelDetails: React.FC = () => {
                                                     <span>{room.available} available</span>
                                                 </span>
                                             </div>
-                                            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                                            <Button
+                                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                onClick={() => handleBookNow(room)}
+                                            >
                                                 Book Now
                                             </Button>
                                         </div>

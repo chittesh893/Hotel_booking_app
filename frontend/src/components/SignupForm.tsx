@@ -5,6 +5,7 @@ import FormInput from './ui/FormInput';
 import FormButton from './ui/FormButton';
 import SuccessMessage from './ui/SuccessMessage';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from './ToastContext';
 
 interface SignupFormProps {
     onLoginClick?: () => void;
@@ -13,6 +14,7 @@ interface SignupFormProps {
 
 const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
     const { register: registerUser } = useAuth();
+    const toast = useToast();
     // const navigate = useNavigate();
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -28,6 +30,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
             await registerUser(data.name, data.email, data.password, data.phone);
             // Show success message
             setShowSuccess(true);
+            toast.showSuccess('Account created successfully!');
             // Call onSuccess callback to close modal and show success on homepage
             setTimeout(() => {
                 if (onSuccess) {

@@ -3,13 +3,16 @@ import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { User, Mail, Phone, LogOut, ArrowLeft } from 'lucide-react';
+import { useToast } from './ToastContext';
 
 const Profile: React.FC = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const toast = useToast();
 
     const handleLogout = () => {
         logout();
+        toast.showInfo('Successfully logged out!');
         navigate('/');
     };
 
@@ -109,20 +112,20 @@ const Profile: React.FC = () => {
                     {/* Quick Actions */}
                     <div className="border-t pt-8">
                         <h3 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                                                 <div className="grid md:grid-cols-2 gap-4">
-                             <Button
-                                 onClick={() => navigate('/my-hotels')}
-                                 className="bg-green-600 hover:bg-green-700 text-white"
-                             >
-                                 My Hotels
-                             </Button>
-                             <Button
-                                 onClick={() => navigate('/add-hotel')}
-                                 className="bg-purple-600 hover:bg-purple-700 text-white"
-                             >
-                                 Add New Hotel
-                             </Button>
-                         </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <Button
+                                onClick={() => navigate('/my-hotels')}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                                My Hotels
+                            </Button>
+                            <Button
+                                onClick={() => navigate('/add-hotel')}
+                                className="bg-purple-600 hover:bg-purple-700 text-white"
+                            >
+                                Add New Hotel
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>

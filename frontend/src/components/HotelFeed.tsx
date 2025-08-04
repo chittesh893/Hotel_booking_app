@@ -4,6 +4,7 @@ import type { Hotel } from '../lib/constants';
 import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useToast } from './ToastContext';
 
 interface HotelFeedProps {
     onHotelClick?: (hotel: Hotel) => void;
@@ -12,6 +13,7 @@ interface HotelFeedProps {
 const HotelFeed: React.FC<HotelFeedProps> = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const toast = useToast();
     const [hotels, setHotels] = useState<Hotel[]>([]);
     const [filteredHotels, setFilteredHotels] = useState<Hotel[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -30,14 +32,15 @@ const HotelFeed: React.FC<HotelFeedProps> = () => {
                 setFilteredHotels(response.data.data);
             } catch (error) {
                 console.error('Error fetching hotels:', error);
+                toast.showError('Failed to load hotels. Using sample data.');
                 // Fallback to sample data if API fails
                 const fallbackHotels: Hotel[] = [
                     {
                         _id: '1',
                         name: 'Grand Plaza Hotel',
                         description: 'Luxurious 5-star hotel in the heart of the city',
-                        location: { 
-                            city: 'Mumbai', 
+                        location: {
+                            city: 'Mumbai',
                             state: 'Maharashtra',
                             country: 'India',
                             address: 'Sample Address 1'
@@ -72,8 +75,8 @@ const HotelFeed: React.FC<HotelFeedProps> = () => {
                         _id: '2',
                         name: 'Seaside Resort',
                         description: 'Beautiful beachfront resort with stunning views',
-                        location: { 
-                            city: 'Goa', 
+                        location: {
+                            city: 'Goa',
                             state: 'Goa',
                             country: 'India',
                             address: 'Sample Address 2'
