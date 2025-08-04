@@ -15,7 +15,12 @@ const app: Express = express();
 const PORT: string | number = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:5000', 'https://hotel-booking-app-dt3c.onrender.com'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Connect to database

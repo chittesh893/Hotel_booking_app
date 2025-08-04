@@ -135,6 +135,8 @@ export default function HomePage() {
                                 <Dialog.Portal>
                                     <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
                                     <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl p-8 w-[450px] max-w-[90vw] max-h-[90vh] overflow-y-auto z-50 border border-gray-200">
+                                        <Dialog.Title className="sr-only">Login</Dialog.Title>
+                                        <Dialog.Description className="sr-only">Login to your account</Dialog.Description>
                                         <div className="absolute top-4 right-4">
                                             <Dialog.Close asChild>
                                                 <button className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -161,6 +163,8 @@ export default function HomePage() {
                                 <Dialog.Portal>
                                     <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
                                     <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl p-8 w-[450px] max-w-[90vw] max-h-[90vh] overflow-y-auto z-50 border border-gray-200">
+                                        <Dialog.Title className="sr-only">Sign Up</Dialog.Title>
+                                        <Dialog.Description className="sr-only">Create a new account</Dialog.Description>
                                         <div className="absolute top-4 right-4">
                                             <Dialog.Close asChild>
                                                 <button className="text-gray-400 hover:text-gray-600 transition-colors">
