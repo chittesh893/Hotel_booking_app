@@ -6,6 +6,9 @@ services:
     buildCommand: npm run install-all && npm run build
     startCommand: npm start
     envVars:
+      - key: NPM_CONFIG_PACKAGE_MANAGER
+        value: npm
+    envVars:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
