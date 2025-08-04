@@ -7,7 +7,7 @@
         "start": "node dist/server.js",
         "dev": "nodemon src/server.ts",
         "build": "npm install && tsc && npm run copy-frontend",
-        "copy-frontend": "copyfiles -u 1 \"../frontend/dist/**/*\" dist/frontend/",
+        "build-with-frontend": "npm run build && echo 'Frontend files copied successfully'""copy-frontend": "node -e \"const fs=require('fs');const path=require('path');const src='../frontend/dist';const dest='dist/frontend';if(fs.existsSync(src)){require('child_process').execSync('copyfiles -u 1 \\\"'+src+'/**/*\\\" '+dest+'/',{stdio:'inherit'});console.log('Frontend files copied successfully');}else{console.error('Frontend dist not found at:', path.resolve(src));process.exit(1);}\"",
         "watch": "tsc -w",
         "test-connection": "ts-node src/test-connection.ts",
         "seed:hotels": "ts-node src/scripts/seedHotels.ts",
