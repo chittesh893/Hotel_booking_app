@@ -80,7 +80,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(user);
             setToken(newToken);
             localStorage.setItem('token', newToken);
-            toast.showSuccess('Successfully logged in!');
         } catch (error: any) {
             // Pass through the specific error message from backend
             const errorMessage = error.response?.data?.error || 'Login failed';
