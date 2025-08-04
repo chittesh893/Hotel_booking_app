@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { uploadSingle, uploadMultiple, handleUploadError } from '../middleware/upload';
 import { auth } from '../middleware/auth';
 import { AuthRequest } from '../types';
@@ -6,13 +6,14 @@ import { AuthRequest } from '../types';
 const router = express.Router();
 
 // Upload single image
-router.post('/single', auth, uploadSingle, handleUploadError, (req: AuthRequest, res) => {
+router.post('/single', auth, uploadSingle, handleUploadError, (req: AuthRequest, res: Response): void => {
     try {
         if (!req.file) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 error: 'No file uploaded'
             });
+            return;
         }
 
         // Create the full URL for the uploaded image
@@ -37,13 +38,14 @@ router.post('/single', auth, uploadSingle, handleUploadError, (req: AuthRequest,
 });
 
 // Upload multiple images
-router.post('/multiple', auth, uploadMultiple, handleUploadError, (req: AuthRequest, res) => {
+router.post('/multiple', auth, uploadMultiple, handleUploadError, (req: AuthRequest, res: Response): void => {
     try {
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 error: 'No files uploaded'
             });
+            return;
         }
 
         const uploadedFiles = (req.files as Express.Multer.File[]).map(file => ({
@@ -70,7 +72,7 @@ router.post('/multiple', auth, uploadMultiple, handleUploadError, (req: AuthRequ
 });
 
 // Delete image
-router.delete('/:filename', auth, (req: AuthRequest, res) => {
+router.delete('/:filename', auth, (req: AuthRequest, res: Response): void => {
     try {
         const { filename } = req.params;
         const fs = require('fs');
