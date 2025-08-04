@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Star, MapPin, Users, Calendar } from 'lucide-react';
-import { Hotel } from '../lib/constants';
+import { Search, Star, MapPin } from 'lucide-react';
+import type { Hotel } from '../lib/constants';
 import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -9,7 +9,7 @@ interface HotelFeedProps {
     onHotelClick?: (hotel: Hotel) => void;
 }
 
-const HotelFeed: React.FC<HotelFeedProps> = ({ onHotelClick }) => {
+const HotelFeed: React.FC<HotelFeedProps> = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [hotels, setHotels] = useState<Hotel[]>([]);
@@ -31,26 +31,78 @@ const HotelFeed: React.FC<HotelFeedProps> = ({ onHotelClick }) => {
             } catch (error) {
                 console.error('Error fetching hotels:', error);
                 // Fallback to sample data if API fails
-                const fallbackHotels = [
+                const fallbackHotels: Hotel[] = [
                     {
                         _id: '1',
                         name: 'Grand Plaza Hotel',
                         description: 'Luxurious 5-star hotel in the heart of the city',
-                        location: { city: 'Mumbai', state: 'Maharashtra' },
+                        location: { 
+                            city: 'Mumbai', 
+                            state: 'Maharashtra',
+                            country: 'India',
+                            address: 'Sample Address 1'
+                        },
                         images: ['https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'],
                         amenities: ['WiFi', 'Pool', 'Restaurant'],
                         rating: 4.5,
-                        pricePerNight: 8000
+                        pricePerNight: 8000,
+                        currency: 'INR',
+                        roomTypes: [
+                            {
+                                name: 'Standard Room',
+                                description: 'Comfortable room',
+                                price: 8000,
+                                capacity: 2,
+                                available: 10
+                            }
+                        ],
+                        contact: {
+                            phone: '+91-1234567890',
+                            email: 'info@grandplaza.com'
+                        },
+                        policies: {
+                            checkIn: '2:00 PM',
+                            checkOut: '11:00 AM',
+                            cancellation: 'Free cancellation',
+                            pets: false,
+                            smoking: false
+                        }
                     },
                     {
                         _id: '2',
                         name: 'Seaside Resort',
                         description: 'Beautiful beachfront resort with stunning views',
-                        location: { city: 'Goa', state: 'Goa' },
+                        location: { 
+                            city: 'Goa', 
+                            state: 'Goa',
+                            country: 'India',
+                            address: 'Sample Address 2'
+                        },
                         images: ['https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800'],
                         amenities: ['WiFi', 'Pool', 'Beach Access'],
                         rating: 4.8,
-                        pricePerNight: 12000
+                        pricePerNight: 12000,
+                        currency: 'INR',
+                        roomTypes: [
+                            {
+                                name: 'Deluxe Room',
+                                description: 'Luxury room',
+                                price: 12000,
+                                capacity: 2,
+                                available: 8
+                            }
+                        ],
+                        contact: {
+                            phone: '+91-9876543210',
+                            email: 'info@seasideresort.com'
+                        },
+                        policies: {
+                            checkIn: '3:00 PM',
+                            checkOut: '12:00 PM',
+                            cancellation: 'Free cancellation',
+                            pets: true,
+                            smoking: false
+                        }
                     }
                 ];
                 setHotels(fallbackHotels);

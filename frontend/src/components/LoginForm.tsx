@@ -13,7 +13,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick, onSuccess }) => {
     const { login } = useAuth();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [showSuccess, setShowSuccess] = useState(false);
 
     const {
@@ -52,7 +52,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick, onSuccess }) => {
             <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="space-y-4">
                     <FormInput
-                        name="email"
+
                         type="email"
                         placeholder="Email address"
                         error={errors.email}
@@ -60,7 +60,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSignupClick, onSuccess }) => {
                         {...register('email')}
                     />
                     <FormInput
-                        name="password"
+
                         type="password"
                         placeholder="Password"
                         error={errors.password}

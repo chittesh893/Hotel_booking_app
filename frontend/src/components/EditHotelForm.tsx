@@ -43,7 +43,7 @@ const EditHotelForm: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
     const [hotel, setHotel] = useState<Hotel | null>(null);
-    
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -105,7 +105,7 @@ const EditHotelForm: React.FC = () => {
     const fetchHotel = async () => {
         try {
             const response = await axios.get(`http://localhost:5000/api/hotels/${hotelId}`);
-            
+
             if (response.data.success) {
                 const hotelData = response.data.data.hotel;
                 setHotel(hotelData);
@@ -146,7 +146,7 @@ const EditHotelForm: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!user || !hotelId) {
             alert('Please log in to edit a hotel');
             return;
@@ -249,7 +249,7 @@ const EditHotelForm: React.FC = () => {
                                     label="Hotel Name"
                                     name="name"
                                     value={formData.name}
-                                    onChange={(e) => handleInputChange('name', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
                                     placeholder="Enter hotel name"
                                     required
                                 />
@@ -258,7 +258,7 @@ const EditHotelForm: React.FC = () => {
                                     name="pricePerNight"
                                     type="number"
                                     value={formData.pricePerNight}
-                                    onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('pricePerNight', parseInt(e.target.value))}
                                     placeholder="5000"
                                     required
                                 />
@@ -269,7 +269,7 @@ const EditHotelForm: React.FC = () => {
                                     name="description"
                                     type="textarea"
                                     value={formData.description}
-                                    onChange={(e) => handleInputChange('description', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('description', e.target.value)}
                                     placeholder="Describe your hotel..."
                                     required
                                 />
@@ -284,7 +284,7 @@ const EditHotelForm: React.FC = () => {
                                     label="City"
                                     name="city"
                                     value={formData.city}
-                                    onChange={(e) => handleInputChange('city', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('city', e.target.value)}
                                     placeholder="Enter city"
                                     required
                                 />
@@ -292,7 +292,7 @@ const EditHotelForm: React.FC = () => {
                                     label="State"
                                     name="state"
                                     value={formData.state}
-                                    onChange={(e) => handleInputChange('state', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('state', e.target.value)}
                                     placeholder="Enter state"
                                     required
                                 />
@@ -302,7 +302,7 @@ const EditHotelForm: React.FC = () => {
                                     label="Address"
                                     name="address"
                                     value={formData.address}
-                                    onChange={(e) => handleInputChange('address', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('address', e.target.value)}
                                     placeholder="Enter full address"
                                     required
                                 />
@@ -317,7 +317,7 @@ const EditHotelForm: React.FC = () => {
                                     label="Phone Number"
                                     name="phone"
                                     value={formData.contact.phone}
-                                    onChange={(e) => handleContactChange('phone', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleContactChange('phone', e.target.value)}
                                     placeholder="+91-1234567890"
                                     required
                                 />
@@ -326,7 +326,7 @@ const EditHotelForm: React.FC = () => {
                                     name="email"
                                     type="email"
                                     value={formData.contact.email}
-                                    onChange={(e) => handleContactChange('email', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleContactChange('email', e.target.value)}
                                     placeholder="info@hotel.com"
                                     required
                                 />

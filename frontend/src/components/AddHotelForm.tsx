@@ -68,7 +68,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!user) {
             alert('Please log in to add a hotel');
             return;
@@ -77,6 +77,16 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
         setIsSubmitting(true);
 
         try {
+            // Validate required fields
+            if (!formData.contact.phone.trim()) {
+                alert('Phone number is required');
+                return;
+            }
+            if (!formData.contact.email.trim()) {
+                alert('Email is required');
+                return;
+            }
+
             const hotelData = {
                 ...formData,
                 location: {
@@ -85,6 +95,11 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                     country: 'India',
                     address: formData.address
                 },
+                contact: {
+                    phone: formData.contact.phone,
+                    email: formData.contact.email
+                },
+                images: ['https://images.unsplash.com/photo-1566073771259-6a8506099945'],
                 roomTypes: [{
                     name: 'Standard Room',
                     description: 'Comfortable room with basic amenities',
@@ -93,6 +108,8 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                     available: 10
                 }]
             };
+
+            console.log('Sending hotel data:', hotelData);
 
             const response = await axios.post('http://localhost:5000/api/hotels', hotelData, {
                 headers: {
@@ -151,7 +168,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     label="Hotel Name"
                                     name="name"
                                     value={formData.name}
-                                    onChange={(e) => handleInputChange('name', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
                                     placeholder="Enter hotel name"
                                     required
                                 />
@@ -160,7 +177,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     name="pricePerNight"
                                     type="number"
                                     value={formData.pricePerNight}
-                                    onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('pricePerNight', parseInt(e.target.value))}
                                     placeholder="5000"
                                     required
                                 />
@@ -171,7 +188,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     name="description"
                                     type="textarea"
                                     value={formData.description}
-                                    onChange={(e) => handleInputChange('description', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('description', e.target.value)}
                                     placeholder="Describe your hotel..."
                                     required
                                 />
@@ -186,7 +203,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     label="City"
                                     name="city"
                                     value={formData.city}
-                                    onChange={(e) => handleInputChange('city', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('city', e.target.value)}
                                     placeholder="Enter city"
                                     required
                                 />
@@ -194,7 +211,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     label="State"
                                     name="state"
                                     value={formData.state}
-                                    onChange={(e) => handleInputChange('state', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('state', e.target.value)}
                                     placeholder="Enter state"
                                     required
                                 />
@@ -204,7 +221,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     label="Address"
                                     name="address"
                                     value={formData.address}
-                                    onChange={(e) => handleInputChange('address', e.target.value)}
+                                    onChange={(e: any) => handleInputChange('address', e.target.value)}
                                     placeholder="Enter full address"
                                     required
                                 />
@@ -219,7 +236,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     label="Phone Number"
                                     name="phone"
                                     value={formData.contact.phone}
-                                    onChange={(e) => handleContactChange('phone', e.target.value)}
+                                    onChange={(e: any) => handleContactChange('phone', e.target.value)}
                                     placeholder="+91-1234567890"
                                     required
                                 />
@@ -228,7 +245,7 @@ const AddHotelForm: React.FC<AddHotelFormProps> = ({ onSuccess, onCancel }) => {
                                     name="email"
                                     type="email"
                                     value={formData.contact.email}
-                                    onChange={(e) => handleContactChange('email', e.target.value)}
+                                    onChange={(e: any) => handleContactChange('email', e.target.value)}
                                     placeholder="info@hotel.com"
                                     required
                                 />

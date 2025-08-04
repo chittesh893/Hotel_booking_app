@@ -1,4 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo } from 'react';
+import type { ReactNode } from 'react';
 import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
 
 interface Props {

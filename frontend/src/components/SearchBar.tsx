@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FiSearch, FiMapPin, FiCalendar, FiUsers, FiFilter, FiX } from 'react-icons/fi';
+import React, { useState } from 'react';
+import { FiSearch, FiMapPin, FiFilter, FiX } from 'react-icons/fi';
 
 interface SearchFilters {
     query: string;

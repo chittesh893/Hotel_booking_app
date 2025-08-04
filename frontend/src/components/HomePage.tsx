@@ -14,7 +14,7 @@ import {
 import * as Dialog from '@radix-ui/react-dialog'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
-import SuccessMessage from './ui/SuccessMessage'
+// import SuccessMessage from './ui/SuccessMessage'
 import HotelFeed from './HotelFeed'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from './AuthContext'

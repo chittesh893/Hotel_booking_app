@@ -13,7 +13,7 @@ interface SignupFormProps {
 
 const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
     const { register: registerUser } = useAuth();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [showSuccess, setShowSuccess] = useState(false);
 
     const {
@@ -61,7 +61,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
                 <div className="space-y-4">
                     <FormInput
                         label="Full Name"
-                        name="name"
+
                         type="text"
                         placeholder="Enter your full name"
                         error={errors.name}
@@ -71,7 +71,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
                     />
                     <FormInput
                         label="Email address"
-                        name="email"
+
                         type="email"
                         placeholder="Enter your email"
                         error={errors.email}
@@ -81,7 +81,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
                     />
                     <FormInput
                         label="Phone Number"
-                        name="phone"
+
                         type="tel"
                         placeholder="Enter your phone number"
                         error={errors.phone}
@@ -91,7 +91,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
                     />
                     <FormInput
                         label="Password"
-                        name="password"
+
                         type="password"
                         placeholder="Enter your password"
                         error={errors.password}
@@ -101,7 +101,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick, onSuccess }) => {
                     />
                     <FormInput
                         label="Confirm Password"
-                        name="confirmPassword"
+
                         type="password"
                         placeholder="Confirm your password"
                         error={errors.confirmPassword}

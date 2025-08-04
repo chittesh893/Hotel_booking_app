@@ -1,153 +1,251 @@
-# HotelHub - Hotel Booking Application
+# Hotel Booking Application
 
-A modern, responsive hotel booking application built with React, TypeScript, and Tailwind CSS.
+A full-stack hotel booking application built with React (Frontend) and Node.js/Express (Backend) with MongoDB database.
 
-## ✨ Features
+## 🚀 Features
 
-### 🔍 Advanced Search & Filtering
-- **Text Search**: Search hotels by name, description, or amenities
-- **Location Filtering**: Filter by city, state, or country
-- **Rating Filter**: Filter by minimum rating (1-5 stars)
-- **Price Range**: Filter by maximum price
-- **Amenities Filter**: Filter by available amenities (WiFi, Pool, Gym, etc.)
-- **Sorting Options**: Sort by latest, rating, name, or price
-- **Pagination**: Navigate through search results efficiently
+- **User Authentication**: Sign up, login, and profile management
+- **Hotel Management**: Add, edit, and manage hotels
+- **Search & Filter**: Find hotels by location, amenities, and price
+- **Responsive Design**: Modern UI with Tailwind CSS
+- **Real-time Updates**: Live hotel availability and booking status
 
-### 🎨 Modern UI/UX
-- **Clean Design**: Minimalist, modern interface with smooth animations
-- **Responsive Layout**: Works perfectly on desktop, tablet, and mobile
-- **Interactive Elements**: Hover effects, loading states, and smooth transitions
-- **Card-based Layout**: Beautiful hotel cards with images and details
-- **Real-time Search**: Instant search results with loading indicators
+## 🛠️ Tech Stack
 
-### 🔐 Authentication & Security
-- **JWT Authentication**: Secure login and registration
-- **Protected Routes**: User-specific content and actions
-- **Role-based Access**: Different permissions for users and admins
+### Frontend
+- React 19 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- React Router for navigation
+- React Hook Form for form handling
+- Axios for API calls
 
-### 📱 User Experience
-- **Sticky Navigation**: Always accessible header with user menu
-- **Loading States**: Smooth loading indicators throughout the app
-- **Error Handling**: Graceful error boundaries and user-friendly messages
-- **Mobile-First**: Optimized for mobile devices with touch-friendly interface
+### Backend
+- Node.js with Express
+- TypeScript
+- MongoDB with Mongoose
+- JWT for authentication
+- bcryptjs for password hashing
 
-## 🚀 Getting Started
+## 📋 Prerequisites
 
-### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- MongoDB (local or cloud)
 
-Make sure you have the backend server running on `http://localhost:5000`
+## 🚀 Quick Start
 
-### Installation
-
-1. Install dependencies:
+### 1. Clone the Repository
 ```bash
-npm install
+git clone <your-repo-url>
+cd hotel-booking-application
 ```
 
-2. Start the development server:
+### 2. Install Dependencies
 ```bash
+# Install all dependencies (root, backend, and frontend)
+npm run install-all
+```
+
+### 3. Environment Setup
+
+Create a `config.env` file in the `backend` directory:
+```env
+MONGODB_URI=mongodb://localhost:27017/hotel-booking
+JWT_SECRET=your-super-secret-jwt-key
+PORT=5000
+NODE_ENV=development
+```
+
+### 4. Database Setup
+
+Make sure MongoDB is running locally or use a cloud MongoDB instance.
+
+### 5. Seed the Database (Optional)
+```bash
+cd backend
+npm run seed:hotels
+```
+
+### 6. Run the Application
+
+#### Development Mode (Separate Frontend & Backend)
+```bash
+# Run both frontend and backend concurrently
 npm run dev
 ```
 
-3. Open your browser and navigate to `http://localhost:5173`
+This will start:
+- Backend server on: http://localhost:5000
+- Frontend development server on: http://localhost:3000
+
+#### Production Build Test
+```bash
+# Build both frontend and backend
+npm run build
+
+# Start the production server
+npm start
+```
+
+This will serve both frontend and backend from: http://localhost:5000
+
+## 🧪 Testing the Application
+
+### 1. Check Backend API
+```bash
+# Test the health endpoint
+curl http://localhost:5000/api/health
+```
+
+Expected response:
+```json
+{
+  "message": "Hotel Booking API is running!",
+  "status": "healthy"
+}
+```
+
+### 2. Test Frontend
+- Open http://localhost:3000 (development) or http://localhost:5000 (production)
+- Navigate through the application
+- Test user registration and login
+- Browse hotels and test search functionality
+
+### 3. Test Database Connection
+```bash
+cd backend
+npm run test-connection
+```
+
+## 🚀 Deployment to Render.com
+
+### 1. Prepare for Deployment
+
+The application is configured for single-server deployment on Render.com. The backend serves the frontend static files.
+
+### 2. Environment Variables on Render
+
+Set these environment variables in your Render dashboard:
+- `MONGODB_URI`: Your MongoDB connection string
+- `JWT_SECRET`: A secure random string for JWT signing
+- `NODE_ENV`: production
+- `PORT`: 10000 (Render's default)
+
+### 3. Deploy
+
+1. Connect your GitHub repository to Render
+2. Use the `render.yaml` configuration file
+3. Render will automatically:
+   - Install dependencies
+   - Build the application
+   - Start the server
+
+### 4. Build Commands
+
+Render will execute these commands:
+```bash
+# Install all dependencies
+npm run install-all
+
+# Build both frontend and backend
+npm run build
+
+# Start the server
+npm start
+```
 
 ## 📁 Project Structure
 
 ```
-src/
-├── components/
-│   ├── AuthContext.tsx      # Authentication context
-│   ├── Header.tsx           # Navigation header
-│   ├── HotelFeed.tsx        # Main hotel listing with search
-│   ├── SearchBar.tsx        # Advanced search component
-│   ├── LoadingSpinner.tsx   # Reusable loading component
-│   ├── ErrorBoundary.tsx    # Error handling component
-│   └── ...                  # Other components
-├── App.tsx                  # Main application component
-└── main.tsx                 # Application entry point
+hotel-booking-application/
+├── backend/                 # Backend server
+│   ├── src/
+│   │   ├── config/         # Database configuration
+│   │   ├── middleware/     # Authentication middleware
+│   │   ├── models/         # MongoDB models
+│   │   ├── routes/         # API routes
+│   │   ├── scripts/        # Database seeding scripts
+│   │   └── server.ts       # Main server file
+│   └── package.json
+├── frontend/               # React frontend
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── lib/           # Utilities and constants
+│   │   └── main.tsx       # App entry point
+│   └── package.json
+├── package.json           # Root package.json
+├── render.yaml           # Render deployment config
+└── README.md
 ```
 
-## 🎯 Key Components
+## 🔧 Available Scripts
 
-### SearchBar
-- Advanced filtering with collapsible options
-- Real-time search with debouncing
-- Multiple filter types (text, location, rating, price, amenities)
-- Sort and pagination controls
+### Root Directory
+- `npm run install-all`: Install dependencies for all packages
+- `npm run build`: Build both frontend and backend
+- `npm start`: Start the production server
+- `npm run dev`: Run both frontend and backend in development
 
-### HotelFeed
-- Responsive grid layout
-- Hotel cards with images, ratings, and details
-- Owner-specific actions (edit/delete)
-- Pagination for large result sets
+### Backend Directory
+- `npm run dev`: Start development server with nodemon
+- `npm run build`: Build TypeScript and copy frontend
+- `npm start`: Start production server
+- `npm run seed:hotels`: Seed database with sample hotels
+- `npm run test-connection`: Test MongoDB connection
 
-### Header
-- Sticky navigation with user menu
-- Mobile-responsive design
-- Active route highlighting
+### Frontend Directory
+- `npm run dev`: Start Vite development server
+- `npm run build`: Build for production
+- `npm run preview`: Preview production build
 
-## 🛠️ Technologies Used
+## 🐛 Troubleshooting
 
-- **React 19** - Modern React with hooks
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Router** - Client-side routing
-- **Axios** - HTTP client for API calls
-- **React Icons** - Beautiful icon library
+### Common Issues
 
-## 🎨 Design System
+1. **MongoDB Connection Error**
+   - Ensure MongoDB is running
+   - Check your `MONGODB_URI` in config.env
+   - Test connection with `npm run test-connection`
 
-### Colors
-- **Primary**: Blue (#3B82F6)
-- **Secondary**: Gray (#6B7280)
-- **Success**: Green (#10B981)
-- **Error**: Red (#EF4444)
-- **Warning**: Yellow (#F59E0B)
+2. **Port Already in Use**
+   - Change the PORT in config.env
+   - Kill processes using the port: `lsof -ti:5000 | xargs kill -9`
 
-### Typography
-- **Headings**: Inter font family
-- **Body**: System font stack
-- **Responsive**: Scales appropriately across devices
+3. **Build Errors**
+   - Clear node_modules and reinstall: `rm -rf node_modules && npm install`
+   - Check TypeScript errors: `npx tsc --noEmit`
 
-### Spacing
-- **Consistent**: 4px base unit system
-- **Responsive**: Adapts to screen size
-- **Accessible**: Proper touch targets and spacing
+4. **Frontend Not Loading**
+   - Ensure backend is running
+   - Check browser console for errors
+   - Verify API endpoints are accessible
 
-## 🔧 Development
+## 📝 API Endpoints
 
-### Available Scripts
+### Authentication
+- `POST /api/auth/signup` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/auth/profile` - Get user profile (protected)
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview production build
+### Hotels
+- `GET /api/hotels` - Get all hotels
+- `GET /api/hotels/:id` - Get hotel by ID
+- `POST /api/hotels` - Create hotel (protected)
+- `PUT /api/hotels/:id` - Update hotel (protected)
+- `DELETE /api/hotels/:id` - Delete hotel (protected)
 
-### Code Style
-
-- **ESLint** - Code linting and formatting
-- **TypeScript** - Strict type checking
-- **Prettier** - Code formatting (via ESLint)
-
-## 🚀 Deployment
-
-The application can be deployed to any static hosting service:
-
-1. Build the application:
-```bash
-npm run build
-```
-
-2. Deploy the `dist` folder to your hosting service
+### Health Check
+- `GET /api/health` - API health status
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
+4. Test thoroughly
 5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the ISC License.

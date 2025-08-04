@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Hotel from '../models/Hotel';
 import User from '../models/User';
-import { SAMPLE_HOTELS } from '../../frontend/src/lib/constants';
+import { SAMPLE_HOTELS } from './constants';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/hotel-booking';
 
@@ -31,7 +31,7 @@ async function seedHotels() {
         }
 
         // Create hotels with the user as owner
-        const hotelsWithOwner = SAMPLE_HOTELS.map(hotel => ({
+        const hotelsWithOwner = SAMPLE_HOTELS.map((hotel: any) => ({
             ...hotel,
             ownerId: user._id
         }));

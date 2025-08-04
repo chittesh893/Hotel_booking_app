@@ -57,7 +57,8 @@ const Dashboard: React.FC = () => {
                         </button>
                     </div>
                     <AddHotelForm
-                        onSuccess={handleHotelAdded}
+                    //@ts-ignore
+                        onSuccess={() => handleHotelAdded()}
                         onCancel={() => setShowAddHotel(false)}
                     />
                 </div>
