@@ -5,6 +5,7 @@ import path from 'path';
 import connectDB from './config/database';
 import authRouter from './routes/auth';
 import hotelsRouter from './routes/hotels';
+import uploadRouter from './routes/upload';
 import { auth } from './middleware/auth';
 import { AuthRequest } from './types';
 
@@ -31,9 +32,14 @@ connectDB();
 const frontendPath = path.join(__dirname, 'frontend/dist');
 app.use(express.static(frontendPath));
 
+// Serve uploaded images
+const uploadsPath = path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsPath));
+
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/hotels', hotelsRouter);
+app.use('/api/upload', uploadRouter);
 
 // Protected route example
 app.get('/api/protected', auth, (req: AuthRequest, res: Response) => {
