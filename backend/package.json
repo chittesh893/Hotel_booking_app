@@ -14,6 +14,7 @@
         "add-test-hotels": "node src/scripts/addTestHotels.js"
     },
     "dependencies": {
+        "@types/multer": "^2.0.0",
         "bcryptjs": "^2.4.3",
         "cors": "^2.8.5",
         "dotenv": "^16.3.1",
@@ -21,6 +22,7 @@
         "express-validator": "^7.0.1",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^7.8.7",
+        "multer": "^2.0.2",
         "stripe": "^13.5.0"
     },
     "devDependencies": {
